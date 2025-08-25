@@ -1,0 +1,168 @@
+<!-- src/app/layouts/main-layout/main-layout.component.html -->
+<div class="main-layout">
+  <!-- Header/Toolbar -->
+  <mat-toolbar color="primary" class="main-toolbar">
+    <!-- Bouton menu pour mobile -->
+    <button
+      mat-icon-button
+      (click)="toggleDrawer()"
+      class="menu-button"
+      *ngIf="isHandset">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <!-- Logo et titre -->
+    <div class="toolbar-title" (click)="navigateTo('/dashboard')">
+      <mat-icon class="app-icon">business</mat-icon>
+      <span class="app-title">RH Application</span>
+    </div>
+
+    <!-- Spacer -->
+    <span class="toolbar-spacer"></span>
+
+    <!-- Indicateur de chargement -->
+    <div class="loading-indicator" *ngIf="isLoading">
+      <mat-spinner diameter="24" color="accent"></mat-spinner>
+    </div>
+
+    <!-- Section utilisateur -->
+    <div class="user-section" *ngIf="currentUser">
+      <!-- Badge de rôle -->
+      <mat-chip-set>
+        <mat-chip [color]="getRoleColor()" selected>
+          <mat-icon matChipAvatar>{{currentUser.role === 3 ? 'admin_panel_settings' : currentUser.role === 2 ? 'supervisor_account' : 'person'}}</mat-icon>
+          {{ getRoleDisplayName() }}
+        </mat-chip>
+      </mat-chip-set>
+
+      <!-- Menu utilisateur -->
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      
+      <mat-menu #userMenu="matMenu">
+        <div class="user-info">
+          <div class="user-name">{{ currentUser.fullName }}</div>
+          <div class="user-email">{{ currentUser.email }}</div>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="goToProfile()">
+          <mat-icon>person</mat-icon>
+          <span>Mon profil</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Se déconnecter</span>
+        </button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+
+  <!-- Container principal avec sidebar et contenu -->
+  <mat-sidenav-container class="main-container">
+    <!-- Sidebar de navigation -->
+    <mat-sidenav 
+      #drawer
+      [mode]="isHandset ? 'over' : 'side'"
+      [opened]="!isHandset"
+      class="main-sidenav">
+      
+      <!-- En-tête de la sidebar -->
+      <div class="sidenav-header">
+        <div class="user-avatar">
+          <mat-icon class="avatar-icon">account_circle</mat-icon>
+        </div>
+        <div class="user-details" *ngIf="currentUser">
+          <div class="user-name">{{ currentUser.fullName }}</div>
+          <div class="user-role">{{ getRoleDisplayName() }}</div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Menu de navigation -->
+      <mat-nav-list class="navigation-list">
+        <ng-container *ngFor="let item of navigationItems">
+          <!-- Élément de menu simple (sans enfants) -->
+          <mat-list-item 
+            *ngIf="!item.children && canShowNavItem(item)"
+            [class.active]="isActiveRoute(item.route)"
+            (click)="navigateTo(item.route)">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </mat-list-item>
+
+          <!-- Élément de menu avec sous-éléments -->
+          <div *ngIf="item.children && canShowNavItem(item)" class="nav-group">
+            <mat-expansion-panel 
+              [expanded]="isActiveRoute(item.route)"
+              class="nav-expansion-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="nav-group-icon">{{ item.icon }}</mat-icon>
+                  {{ item.label }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <!-- Sous-éléments -->
+              <mat-nav-list class="sub-nav-list">
+                <mat-list-item 
+                  *ngFor="let child of item.children"
+                  [class.active]="isActiveRoute(child.route)"
+                  (click)="navigateTo(child.route)"
+                  class="sub-nav-item">
+                  <mat-icon matListItemIcon class="sub-nav-icon">{{ child.icon }}</mat-icon>
+                  <span matListItemTitle>{{ child.label }}</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-expansion-panel>
+          </div>
+        </ng-container>
+      </mat-nav-list>
+
+      <!-- Pied de sidebar -->
+      <div class="sidenav-footer">
+        <mat-divider></mat-divider>
+        <div class="footer-content">
+          <div class="app-version">Version 1.0.0</div>
+          <div class="copyright">© 2024 RH App</div>
+        </div>
+      </div>
+    </mat-sidenav>
+
+    <!-- Contenu principal -->
+    <mat-sidenav-content class="main-content">
+      <!-- Breadcrumbs (fil d'Ariane) -->
+      <div class="breadcrumb-container" *ngIf="!isHandset">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a (click)="navigateTo('/dashboard')">
+                <mat-icon>home</mat-icon>
+                Accueil
+              </a>
+            </li>
+            <!-- Les breadcrumbs spécifiques seront ajoutés par chaque composant -->
+          </ol>
+        </nav>
+      </div>
+
+      <!-- Zone de contenu des pages -->
+      <main class="page-content">
+        <router-outlet></router-outlet>
+      </main>
+
+      <!-- Footer -->
+      <footer class="main-footer" *ngIf="!isHandset">
+        <div class="footer-content">
+          <div class="footer-left">
+            <span>RH Application - Gestion des Ressources Humaines</span>
+          </div>
+          <div class="footer-right">
+            <span>Développé avec Angular et Material Design</span>
+          </div>
+        </div>
+      </footer>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

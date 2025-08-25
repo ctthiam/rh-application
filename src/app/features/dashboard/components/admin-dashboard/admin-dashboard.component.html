@@ -1,0 +1,207 @@
+<div class="admin-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <mat-icon>admin_panel_settings</mat-icon>
+          Tableau de bord Administrateur
+        </h1>
+        <p class="subtitle">Vue d'ensemble de l'organisation</p>
+      </div>
+      
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="onRefresh()" [disabled]="isLoading">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-content" [class.loading]="isLoading">
+    
+    <!-- Statistics Cards -->
+    <div class="stats-section">
+      <h2 class="section-title">
+        <mat-icon>analytics</mat-icon>
+        Statistiques Générales
+      </h2>
+      
+      <div class="stats-grid">
+        <mat-card class="stat-card" *ngFor="let card of statCards" [ngClass]="'stat-' + card.color">
+          <mat-card-content>
+            <div class="stat-header">
+              <mat-icon [ngClass]="'icon-' + card.color">{{ card.icon }}</mat-icon>
+              <div class="stat-value">{{ card.value | number }}</div>
+            </div>
+            <div class="stat-title">{{ card.title }}</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="metrics-section">
+      <h2 class="section-title">
+        <mat-icon>trending_up</mat-icon>
+        Indicateurs de Performance
+      </h2>
+      
+      <div class="metrics-grid">
+        <mat-card class="metric-card completion">
+          <mat-card-content>
+            <div class="metric-header">
+              <h3>Taux de Completion</h3>
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="metric-value">{{ completionRate }}%</div>
+            <mat-progress-bar mode="determinate" [value]="completionRate" color="primary"></mat-progress-bar>
+            <div class="metric-detail">{{ stats.completedTasks }} / {{ stats.totalTasks }} tâches</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="metric-card overdue">
+          <mat-card-content>
+            <div class="metric-header">
+              <h3>Tâches en Retard</h3>
+              <mat-icon>warning</mat-icon>
+            </div>
+            <div class="metric-value">{{ stats.overdueTasks }}</div>
+            <mat-progress-bar mode="determinate" [value]="overdueRate" color="warn"></mat-progress-bar>
+            <div class="metric-detail">{{ overdueRate }}% du total</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="metric-card today">
+          <mat-card-content>
+            <div class="metric-header">
+              <h3>Tâches Aujourd'hui</h3>
+              <mat-icon>today</mat-icon>
+            </div>
+            <div class="metric-value">{{ stats.todayTasks }}</div>
+            <mat-progress-bar mode="determinate" [value]="todayTasksRate" color="accent"></mat-progress-bar>
+            <div class="metric-detail">{{ todayTasksRate }}% du total</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Charts and Recent Tasks -->
+    <div class="content-grid">
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <h2 class="section-title">
+          <mat-icon>bar_chart</mat-icon>
+          Graphiques
+        </h2>
+        
+        <mat-card class="chart-placeholder">
+          <mat-card-content>
+            <div class="placeholder-content">
+              <mat-icon>bar_chart</mat-icon>
+              <h3>Graphiques en cours de développement</h3>
+              <p>Les graphiques de statistiques seront bientôt disponibles.</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Recent Tasks Section -->
+      <div class="tasks-section">
+        <h2 class="section-title">
+          <mat-icon>assignment_late</mat-icon>
+          Tâches Récentes
+        </h2>
+        
+        <mat-card>
+          <mat-card-content>
+            <div *ngIf="recentTasks.length === 0" class="no-tasks">
+              <mat-icon>assignment</mat-icon>
+              <p>Aucune tâche récente</p>
+            </div>
+            
+            <div *ngFor="let task of recentTasks" class="task-item">
+              <div class="task-info">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <small>Échéance: {{ task.dueDate | date:'short' }}</small>
+              </div>
+              <div class="task-status">
+                <mat-chip [color]="getTaskStatusColor(task.status)" selected>
+                  {{ getTaskStatusText(task.status) }}
+                </mat-chip>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="notifications-section">
+      <h2 class="section-title">
+        <mat-icon>notifications</mat-icon>
+        Notifications Système
+      </h2>
+      
+      <mat-card>
+        <mat-card-content>
+          <div class="no-notifications">
+            <mat-icon>notifications_none</mat-icon>
+            <p>Aucune notification système</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">
+        <mat-icon>flash_on</mat-icon>
+        Actions Rapides
+      </h2>
+      
+      <div class="actions-grid">
+        <mat-card class="action-card" routerLink="/employees/add">
+          <mat-card-content>
+            <mat-icon>person_add</mat-icon>
+            <h3>Ajouter un Employé</h3>
+            <p>Créer un nouveau profil employé</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/departments/add">
+          <mat-card-content>
+            <mat-icon>business</mat-icon>
+            <h3>Nouveau Département</h3>
+            <p>Créer un nouveau département</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/tasks/add">
+          <mat-card-content>
+            <mat-icon>add_task</mat-icon>
+            <h3>Créer une Tâche</h3>
+            <p>Assigner une nouvelle tâche</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/users/add">
+          <mat-card-content>
+            <mat-icon>person_add</mat-icon>
+            <h3>Nouvel Utilisateur</h3>
+            <p>Créer un compte utilisateur</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+  </div>
+</div>

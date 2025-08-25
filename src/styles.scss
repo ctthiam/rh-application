@@ -1,0 +1,271 @@
+/* Importation du thème Material Design */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Styles globaux pour l'application RH */
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color: #f5f5f5;
+}
+
+/* Amélioration de la toolbar Material */
+.mat-toolbar.mat-primary {
+  background: #3f51b5 !important;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Classes utilitaires */
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-24 { margin-bottom: 24px; }
+
+.p-8 { padding: 8px; }
+.p-16 { padding: 16px; }
+.p-24 { padding: 24px; }
+
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
+/* Styles pour les formulaires */
+.form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Styles pour les boutons */
+.mat-raised-button {
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.mat-fab {
+  position: fixed !important;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* Styles pour les cartes */
+.mat-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+}
+
+.dashboard-card {
+  margin: 16px;
+}
+
+.dashboard-card-content {
+  text-align: center;
+}
+
+/* Styles pour les tables */
+.mat-elevation-z8 {
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mat-table {
+  background: white;
+}
+
+.mat-header-row {
+  background: #fafafa;
+}
+
+.mat-row:hover {
+  background: #f5f5f5;
+}
+
+/* Animation de chargement */
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  
+  p {
+    margin: 0;
+    color: #666;
+    font-weight: 500;
+  }
+}
+
+/* Styles pour les snackbar */
+.mat-snack-bar-container {
+  border-radius: 8px !important;
+}
+
+/* Styles pour les dialog */
+.mat-dialog-container {
+  border-radius: 12px !important;
+  padding: 0 !important;
+}
+
+.mat-dialog-title {
+  margin-bottom: 20px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Styles pour les icônes de statut */
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  
+  &.completed {
+    color: #4caf50;
+  }
+  
+  &.pending {
+    color: #ff9800;
+  }
+  
+  &.overdue {
+    color: #f44336;
+  }
+}
+
+/* Styles pour les chips */
+.mat-chip {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  
+  &.status-completed {
+    background: #e8f5e8 !important;
+    color: #2e7d32 !important;
+  }
+  
+  &.status-pending {
+    background: #fff3e0 !important;
+    color: #f57c00 !important;
+  }
+  
+  &.status-overdue {
+    background: #ffebee !important;
+    color: #c62828 !important;
+  }
+}
+
+/* Styles responsifs */
+@media (max-width: 768px) {
+  .form-container {
+    margin: 10px;
+    padding: 16px;
+  }
+  
+  .mat-toolbar {
+    padding: 0 8px;
+  }
+  
+  .mat-fab {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .dashboard-card {
+    margin: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mat-dialog-container {
+    margin: 8px !important;
+    width: calc(100vw - 16px) !important;
+    max-width: none !important;
+  }
+}
+
+/* Amélioration de l'accessibilité */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible pour une meilleure accessibilité */
+.mat-raised-button:focus,
+.mat-icon-button:focus,
+.mat-fab:focus {
+  outline: 2px solid #3f51b5;
+  outline-offset: 2px;
+}
+
+/* Styles personnalisés pour les progress bars */
+.mat-progress-bar {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mat-progress-bar-fill::after {
+  border-radius: 4px;
+}
+
+/* Animation de fadeIn */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}

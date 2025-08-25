@@ -1,0 +1,80 @@
+<mat-card class="notifications-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>notifications</mat-icon>
+      Notifications
+      <mat-chip *ngIf="unreadCount > 0" class="unread-badge">{{ unreadCount }}</mat-chip>
+    </mat-card-title>
+    <div class="card-actions">
+      <button mat-icon-button (click)="onClearAll()" matTooltip="Tout marquer comme lu" *ngIf="unreadCount > 0">
+        <mat-icon>done_all</mat-icon>
+      </button>
+      <button mat-icon-button (click)="toggleShowAll()" [matTooltip]="showAll ? 'Voir moins' : 'Voir tout'">
+        <mat-icon>{{ showAll ? 'expand_less' : 'expand_more' }}</mat-icon>
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="notifications-container" *ngIf="!loading; else loadingTemplate">
+      <div 
+        *ngFor="let notification of displayedNotifications; trackBy: trackByNotificationId" 
+        class="notification-item"
+        [ngClass]="getNotificationClasses(notification)"
+        (click)="onNotificationClick(notification)">
+        
+        <div class="notification-icon">
+          <mat-icon [ngClass]="getNotificationColor(notification.type)">
+            {{ getNotificationIcon(notification.type) }}
+          </mat-icon>
+        </div>
+
+        <div class="notification-content">
+          <div class="notification-header">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-meta">
+              <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
+              <button 
+                *ngIf="!notification.read"
+                mat-icon-button 
+                class="mark-read-btn"
+                (click)="onMarkAsRead($event, notification.id)"
+                matTooltip="Marquer comme lu">
+                <mat-icon>done</mat-icon>
+              </button>
+            </div>
+          </div>
+          
+          <div class="notification-message">{{ notification.message }}</div>
+          
+          <div class="notification-action" *ngIf="notification.actionUrl">
+            <button mat-button color="primary" class="action-btn">
+              Voir détails
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="notification-indicator" *ngIf="!notification.read"></div>
+      </div>
+
+      <div class="no-notifications" *ngIf="notifications.length === 0">
+        <mat-icon>notifications_none</mat-icon>
+        <p>Aucune notification</p>
+      </div>
+
+      <div class="show-more" *ngIf="notifications.length > 5 && !showAll">
+        <button mat-button (click)="toggleShowAll()">
+          Voir {{ notifications.length - 5 }} notification(s) de plus
+        </button>
+      </div>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Chargement des notifications...</p>
+      </div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

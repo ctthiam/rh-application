@@ -1,0 +1,749 @@
+/* src/app/features/dashboard/components/manager-dashboard/manager-dashboard.component.scss */
+
+.manager-dashboard {
+  min-height: 100vh;
+  background: #f5f5f5;
+  position: relative;
+}
+
+// Header
+.dashboard-header {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  .header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+
+  .title-section {
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 300;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      mat-icon {
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      @media (max-width: 768px) {
+        font-size: 2rem;
+        
+        mat-icon {
+          font-size: 2rem;
+          width: 2rem;
+          height: 2rem;
+        }
+      }
+    }
+
+    .subtitle {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+      font-size: 1.1rem;
+      font-weight: 300;
+      
+      @media (max-width: 768px) {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      backdrop-filter: blur(10px);
+      
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+}
+
+// Loading overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Main content
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+  
+  &.loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
+
+// Section titles
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+
+  mat-icon {
+    color: #4caf50;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .section-title {
+    margin: 0;
+  }
+}
+
+// Statistics section
+.stats-section {
+  margin-bottom: 3rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+.stat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  &.stat-primary {
+    border-left-color: #4caf50;
+    
+    .icon-primary {
+      color: #4caf50;
+      background: rgba(76, 175, 80, 0.1);
+    }
+  }
+
+  &.stat-accent {
+    border-left-color: #ff4081;
+    
+    .icon-accent {
+      color: #ff4081;
+      background: rgba(255, 64, 129, 0.1);
+    }
+  }
+
+  &.stat-warn {
+    border-left-color: #ff9800;
+    
+    .icon-warn {
+      color: #ff9800;
+      background: rgba(255, 152, 0, 0.1);
+    }
+  }
+
+  mat-card-content {
+    padding: 1.5rem;
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+      padding: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #333;
+      line-height: 1;
+    }
+  }
+
+  .stat-title {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Performance section
+.performance-section {
+  margin-bottom: 3rem;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.performance-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  mat-card-content {
+    padding: 1.5rem;
+  }
+
+  .perf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    mat-icon {
+      font-size: 1.5rem;
+      opacity: 0.7;
+    }
+  }
+
+  .perf-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  mat-progress-bar {
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    height: 8px;
+  }
+
+  .perf-detail {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  &.completion {
+    .perf-value {
+      color: #4caf50;
+    }
+  }
+
+  &.active {
+    .perf-value {
+      color: #2196f3;
+    }
+  }
+
+  &.overdue {
+    .perf-value {
+      color: #f44336;
+    }
+  }
+}
+
+// Main grid layout
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Team section
+.team-section {
+  .team-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    mat-card-content {
+      padding: 1.5rem;
+    }
+  }
+
+  .employee-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .employee-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #e3f2fd;
+      transform: translateX(4px);
+    }
+
+    .employee-avatar {
+      mat-icon {
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        color: #4caf50;
+      }
+    }
+
+    .employee-info {
+      flex: 1;
+
+      .employee-name {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.25rem;
+      }
+
+      .employee-role {
+        font-size: 0.9rem;
+        color: #666;
+      }
+    }
+
+    .employee-stats {
+      mat-chip-list mat-chip {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+// Top performers section
+.performers-section {
+  .performers-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    mat-card-content {
+      padding: 1.5rem;
+    }
+  }
+
+  .performer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .performer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+
+    &.rank-1 {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #333;
+    }
+
+    &.rank-2 {
+      background: linear-gradient(135deg, #c0c0c0 0%, #e5e5e5 100%);
+      color: #333;
+    }
+
+    &.rank-3 {
+      background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+      color: white;
+    }
+
+    .performer-rank {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 40px;
+
+      mat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .rank-number {
+        font-weight: bold;
+        font-size: 0.8rem;
+      }
+    }
+
+    .performer-info {
+      flex: 1;
+
+      .performer-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .performer-stats {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+    }
+
+    .performer-rate {
+      text-align: right;
+      min-width: 80px;
+
+      .rate-value {
+        font-weight: bold;
+        font-size: 1.1rem;
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+
+      mat-progress-bar {
+        width: 60px;
+        height: 4px;
+      }
+    }
+  }
+}
+
+// Pending tasks section
+.pending-tasks-section {
+  .tasks-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+    mat-card-content {
+      padding: 1.5rem;
+    }
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;}
+      .task-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #e8f5e9;
+      transform: translateX(4px);
+    }
+
+    .task-checkbox {
+      mat-checkbox {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .task-info {
+      flex: 1;
+
+      .task-title {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+      }
+
+      .task-description {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+        max-width: 500px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .task-due-date {
+        font-size: 0.85rem;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        mat-icon {
+          font-size: 1rem;
+          width: 1rem;
+          height: 1rem;
+          color: #ff9800;
+        }
+      }
+    }
+
+    .task-status {
+      mat-chip {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+
+        &.status-en-cours {
+          background: #2196f3;
+          color: white;
+        }
+
+        &.status-termine {
+          background: #4caf50;
+          color: white;
+        }
+
+        &.status-en-retard {
+          background: #f44336;
+          color: white;
+        }
+      }
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        mat-icon {
+          font-size: 1.2rem;
+          width: 1.2rem;
+          height: 1.2rem;
+        }
+
+        &.edit-btn {
+          color: #2196f3;
+        }
+
+        &.delete-btn {
+          color: #f44336;
+        }
+      }
+    }
+  }
+
+  .no-tasks {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-size: 1rem;
+    font-style: italic;
+  }
+}
+
+// Modal styles (for task details/edit)
+.task-dialog {
+  .mat-mdc-dialog-container {
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .dialog-header {
+    background: #4caf50;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    button {
+      color: white;
+    }
+  }
+
+  .dialog-content {
+    padding: 1.5rem;
+
+    .form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+
+      mat-label {
+        color: #333;
+        font-weight: 500;
+      }
+
+      mat-error {
+        font-size: 0.85rem;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      button {
+        &.save-btn {
+          background: #4caf50;
+          color: white;
+        }
+
+        &.cancel-btn {
+          background: #f44336;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .task-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  .task-info {
+    .task-description {
+      max-width: 100%;
+    }
+  }
+
+  .task-status {
+    width: 100%;
+    text-align: right;
+  }
+}
+
+// Animation for loading states
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+// Error states
+.error-message {
+  background: #f44336;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+
+// Empty state for sections
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 1rem;
+  font-style: italic;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #eee;
+
+  mat-icon {
+    font-size: 2rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+  }
+}

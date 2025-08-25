@@ -1,0 +1,333 @@
+<!-- src/app/features/dashboard/components/employee-dashboard/employee-dashboard.component.html -->
+
+<div class="employee-dashboard" *ngIf="!isLoading">
+  <!-- En-tête -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="welcome-section">
+        <h1>Mon Tableau de Bord</h1>
+        <p class="motivation-message">{{ getMotivationMessage() }}</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="refreshData()">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques personnelles -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <!-- Mes tâches -->
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon">
+              <mat-icon color="primary">assignment</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.myTasks || 0 }}</h3>
+              <p>Mes Tâches</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tâches terminées -->
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon success">
+              <mat-icon color="primary">check_circle</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.myCompletedTasks || 0 }}</h3>
+              <p>Terminées</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tâches en retard -->
+      <mat-card class="stat-card" [class.warning]="(stats.myOverdueTasks || 0) > 0">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon warning">
+              <mat-icon color="warn">schedule</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ stats.myOverdueTasks || 0 }}</h3>
+              <p>En Retard</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Progression -->
+      <mat-card class="stat-card progress-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-icon progress">
+              <mat-icon color="accent">trending_up</mat-icon>
+            </div>
+            <div class="stat-info">
+              <h3>{{ getProgressPercentage() }}%</h3>
+              <p>Progression</p>
+              <mat-progress-bar 
+                mode="determinate" 
+                [value]="getProgressPercentage()"
+                color="accent">
+              </mat-progress-bar>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Navigation par onglets -->
+  <mat-card class="content-card">
+    <mat-tab-group [(selectedIndex)]="selectedTab" class="dashboard-tabs">
+      
+      <!-- Onglet Mes Tâches -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Mes Tâches ({{ myTasks.length }})
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="tab-header">
+            <h2>Toutes mes tâches</h2>
+            <p>Gérez et suivez l'avancement de vos tâches</p>
+          </div>
+
+          <div class="tasks-table" *ngIf="myTasks.length > 0; else noTasks">
+            <table mat-table [dataSource]="myTasks" class="tasks-mat-table">
+              
+              <!-- Colonne Titre -->
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Titre</th>
+                <td mat-cell *matCellDef="let task">
+                  <div class="task-title">
+                    <strong>{{ task.title }}</strong>
+                    <mat-chip-set *ngIf="task.isOverdue && task.status !== 2">
+                      <mat-chip color="warn">
+                        <mat-icon matChipTrailingIcon>warning</mat-icon>
+                        En retard
+                      </mat-chip>
+                    </mat-chip-set>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Description -->
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Description</th>
+                <td mat-cell *matCellDef="let task">
+                  <span class="task-description" [title]="task.description">
+                    {{ task.description | slice:0:100 }}
+                    <span *ngIf="task.description.length > 100">...</span>
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Date limite -->
+              <ng-container matColumnDef="dueDate">
+                <th mat-header-cell *matHeaderCellDef>Échéance</th>
+                <td mat-cell *matCellDef="let task">
+                  <div class="due-date">
+                    <mat-icon>event</mat-icon>
+                    {{ task.dueDate | date:'short':'fr' }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Status -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Statut</th>
+                <td mat-cell *matCellDef="let task">
+                  <mat-chip-set>
+                    <mat-chip [color]="getStatusColor(task.status)">
+                      <mat-icon matChipLeadingIcon>{{ getStatusIcon(task.status) }}</mat-icon>
+                      {{ getStatusText(task.status) }}
+                    </mat-chip>
+                  </mat-chip-set>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Priorité -->
+              <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef>Priorité</th>
+                <td mat-cell *matCellDef="let task">
+                  <span class="priority-badge" [style.background-color]="getPriorityColor(task.priority)">
+                    {{ task.priority }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Colonne Actions -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let task">
+                  <div class="task-actions">
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      *ngIf="canMarkAsCompleted(task)"
+                      (click)="markTaskAsCompleted(task.id)"
+                      matTooltip="Marquer comme terminée">
+                      <mat-icon>check</mat-icon>
+                      Terminer
+                    </button>
+                    
+                    <mat-chip *ngIf="task.status === 2" color="primary">
+                      <mat-icon matChipLeadingIcon>check_circle</mat-icon>
+                      Terminée
+                    </mat-chip>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="task-row"></tr>
+            </table>
+          </div>
+
+          <ng-template #noTasks>
+            <div class="no-data">
+              <mat-icon>assignment_turned_in</mat-icon>
+              <h3>Aucune tâche assignée</h3>
+              <p>Vous n'avez actuellement aucune tâche assignée.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- Onglet Tâches du jour -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Aujourd'hui ({{ todayTasks.length }})
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="tab-header">
+            <h2>Tâches d'aujourd'hui</h2>
+            <p>Concentrez-vous sur vos tâches du jour</p>
+          </div>
+
+          <div class="today-tasks" *ngIf="todayTasks.length > 0; else noTodayTasks">
+            <div class="task-card" *ngFor="let task of todayTasks" [class.completed]="task.status === 2">
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>{{ task.title }}</mat-card-title>
+                  <mat-card-subtitle>{{ task.departmentName }}</mat-card-subtitle>
+                  <div class="header-actions">
+                    <mat-chip [color]="getStatusColor(task.status)">
+                      {{ getStatusText(task.status) }}
+                    </mat-chip>
+                  </div>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="priority" [style.color]="getPriorityColor(task.priority)">
+                      <mat-icon>flag</mat-icon>
+                      {{ task.priority }}
+                    </span>
+                    <span class="due-time">
+                      <mat-icon>schedule</mat-icon>
+                      {{ task.dueDate | date:'HH:mm' }}
+                    </span>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions *ngIf="canMarkAsCompleted(task)">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="markTaskAsCompleted(task.id)">
+                    <mat-icon>check</mat-icon>
+                    Marquer comme terminée
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </div>
+
+          <ng-template #noTodayTasks>
+            <div class="no-data">
+              <mat-icon>today</mat-icon>
+              <h3>Aucune tâche aujourd'hui</h3>
+              <p>Vous n'avez pas de tâches prévues pour aujourd'hui.</p>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+
+      <!-- Onglet Tâches en retard -->
+      <mat-tab *ngIf="overdueTasks.length > 0">
+        <ng-template mat-tab-label>
+          En Retard ({{ overdueTasks.length }})
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="tab-header warning">
+            <h2>Tâches en retard</h2>
+            <p>Ces tâches nécessitent votre attention immédiate</p>
+          </div>
+
+          <div class="overdue-tasks">
+            <div class="task-card overdue" *ngFor="let task of overdueTasks">
+              <mat-card>
+                <mat-card-header>
+                  <mat-card-title>{{ task.title }}</mat-card-title>
+                  <mat-card-subtitle>{{ task.departmentName }}</mat-card-subtitle>
+                  <div class="header-actions">
+                    <mat-chip color="warn">
+                      <mat-icon matChipLeadingIcon>warning</mat-icon>
+                      En retard
+                    </mat-chip>
+                  </div>
+                </mat-card-header>
+                
+                <mat-card-content>
+                  <p>{{ task.description }}</p>
+                  <div class="task-meta">
+                    <span class="priority" [style.color]="getPriorityColor(task.priority)">
+                      <mat-icon>flag</mat-icon>
+                      {{ task.priority }}
+                    </span>
+                    <span class="overdue-date">
+                      <mat-icon>event_busy</mat-icon>
+                      Échéance : {{ task.dueDate | date:'short':'fr' }}
+                    </span>
+                  </div>
+                </mat-card-content>
+                
+                <mat-card-actions>
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="markTaskAsCompleted(task.id)">
+                    <mat-icon>check</mat-icon>
+                    Marquer comme terminée
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-card>
+</div>
+
+<!-- Indicateur de chargement -->
+<div class="loading-container" *ngIf="isLoading">
+  <mat-spinner diameter="50"></mat-spinner>
+  <p>Chargement de votre tableau de bord...</p>
+</div>

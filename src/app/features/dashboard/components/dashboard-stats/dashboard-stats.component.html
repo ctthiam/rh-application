@@ -1,0 +1,53 @@
+<div class="dashboard-stats">
+  <div class="stats-grid">
+    <mat-card 
+       *ngFor="let stat of statCards; trackBy: trackByStat"
+       class="stat-card"
+       [class.warning]="stat.color === 'warn'"
+       [class.success]="stat.color === 'accent'"
+       [class.primary]="stat.color === 'primary'">
+       
+      <mat-card-content>
+        <div class="stat-content">
+          <!-- Icône -->
+          <div class="stat-icon" [style.background-color]="stat.backgroundColor">
+            <mat-icon [color]="stat.color">{{ stat.icon }}</mat-icon>
+          </div>
+          
+          <!-- Informations -->
+          <div class="stat-info">
+            <div class="stat-header">
+              <h3 class="stat-value">{{ stat.value }}</h3>
+              <div class="stat-trend" *ngIf="stat.trend">
+                <mat-icon 
+                   [class.positive]="stat.trend.isPositive"
+                   [class.negative]="!stat.trend.isPositive">
+                  {{ stat.trend.isPositive ? 'trending_up' : 'trending_down' }}
+                </mat-icon>
+                <span>{{ stat.trend.value }}%</span>
+              </div>
+            </div>
+            
+            <p class="stat-title">{{ stat.title }}</p>
+            <p class="stat-description" *ngIf="stat.description">{{ stat.description }}</p>
+            
+            <!-- Barre de progression pour les pourcentages -->
+            <div class="progress-section" *ngIf="stat.title.includes('Progression') || stat.title.includes('Productivité')">
+              <mat-progress-bar 
+                 mode="determinate"
+                 [value]="stat.value"
+                 [color]="stat.color">
+              </mat-progress-bar>
+              <span class="progress-label" [style.color]="getProgressColor(stat.value)">
+                {{ getProgressMessage(stat.value) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      
+      <!-- Animation de survol -->
+      <div class="card-overlay"></div>
+    </mat-card>
+  </div>
+</div>

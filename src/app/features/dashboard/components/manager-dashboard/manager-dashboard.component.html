@@ -1,0 +1,298 @@
+<!-- src/app/features/dashboard/components/manager-dashboard/manager-dashboard.component.html -->
+
+<div class="manager-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <mat-icon>manage_accounts</mat-icon>
+          Tableau de bord Manager
+        </h1>
+        <p class="subtitle" *ngIf="userDepartment">
+          Département {{ userDepartment.name }}
+        </p>
+      </div>
+      
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="onCreateTask()">
+          <mat-icon>add_task</mat-icon>
+          Nouvelle Tâche
+        </button>
+        <button mat-raised-button color="accent" (click)="onRefresh()" [disabled]="isLoading">
+          <mat-icon>refresh</mat-icon>
+          Actualiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Main Content -->
+  <div class="dashboard-content" [class.loading]="isLoading">
+    
+    <!-- Department Stats -->
+    <div class="stats-section">
+      <h2 class="section-title">
+        <mat-icon>analytics</mat-icon>
+        Statistiques du Département
+      </h2>
+      
+      <div class="stats-grid">
+        <mat-card class="stat-card" *ngFor="let card of statCards" [ngClass]="'stat-' + card.color">
+          <mat-card-content>
+            <div class="stat-header">
+              <mat-icon [ngClass]="'icon-' + card.color">{{ card.icon }}</mat-icon>
+              <div class="stat-value">{{ card.value | number }}</div>
+            </div>
+            <div class="stat-title">{{ card.title }}</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="performance-section">
+      <h2 class="section-title">
+        <mat-icon>trending_up</mat-icon>
+        Performance du Département
+      </h2>
+      
+      <div class="performance-grid">
+        <mat-card class="performance-card completion">
+          <mat-card-content>
+            <div class="perf-header">
+              <h3>Taux de Completion</h3>
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="perf-value">{{ departmentCompletionRate }}%</div>
+            <mat-progress-bar mode="determinate" [value]="departmentCompletionRate" color="primary"></mat-progress-bar>
+            <div class="perf-detail">
+              {{ stats.completedTasks }} tâches terminées sur {{ departmentTasks.length }}
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="performance-card active">
+          <mat-card-content>
+            <div class="perf-header">
+              <h3>Employés Actifs</h3>
+              <mat-icon>people_alt</mat-icon>
+            </div>
+            <div class="perf-value">{{ activeEmployees }}</div>
+            <mat-progress-bar mode="determinate" [value]="(activeEmployees / departmentEmployees.length) * 100" color="accent"></mat-progress-bar>
+            <div class="perf-detail">
+              {{ activeEmployees }} sur {{ departmentEmployees.length }} employés
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="performance-card overdue">
+          <mat-card-content>
+            <div class="perf-header">
+              <h3>Tâches en Retard</h3>
+              <mat-icon>warning</mat-icon>
+            </div>
+            <div class="perf-value">{{ stats.overdueTasks }}</div>
+            <mat-progress-bar mode="determinate" [value]="departmentOverdueRate" color="warn"></mat-progress-bar>
+            <div class="perf-detail">
+              {{ departmentOverdueRate }}% du total
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+      
+      <!-- Left Column -->
+      <div class="left-column">
+        
+        <!-- Department Team -->
+        <div class="team-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <mat-icon>group</mat-icon>
+              Mon Équipe
+            </h2>
+            <button mat-icon-button routerLink="/employees" matTooltip="Voir tous les employés">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
+          
+          <mat-card class="team-card">
+            <mat-card-content>
+              <div class="employee-list" *ngIf="departmentEmployees.length > 0; else noEmployees">
+                <div class="employee-item" *ngFor="let employee of departmentEmployees.slice(0, 6)" 
+                     (click)="onViewEmployee(employee.id)">
+                  <div class="employee-avatar">
+                    <mat-icon>account_circle</mat-icon>
+                  </div>
+                  <div class="employee-info">
+                    <div class="employee-name">{{ employee.fullName }}</div>
+                    <div class="employee-role">{{ employee.position }}</div>
+                  </div>
+                  <div class="employee-stats">
+                    <mat-chip-set>
+                      <mat-chip>
+                        {{ getTaskCountForEmployee(employee) }} tâches
+                      </mat-chip>
+                    </mat-chip-set>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #noEmployees>
+                <div class="empty-state">
+                  <mat-icon>group_off</mat-icon>
+                  <p>Aucun employé dans ce département</p>
+                </div>
+              </ng-template>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Top Performers -->
+        <div class="performers-section" *ngIf="topPerformers.length > 0">
+          <h2 class="section-title">
+            <mat-icon>emoji_events</mat-icon>
+            Top Performers
+          </h2>
+          
+          <mat-card class="performers-card">
+            <mat-card-content>
+              <div class="performer-list">
+                <div class="performer-item" *ngFor="let performer of topPerformers; let i = index"
+                     [ngClass]="'rank-' + (i + 1)">
+                  <div class="performer-rank">
+                    <mat-icon *ngIf="i === 0">emoji_events</mat-icon>
+                    <mat-icon *ngIf="i === 1">military_tech</mat-icon>
+                    <mat-icon *ngIf="i === 2">workspace_premium</mat-icon>
+                    <span class="rank-number">{{ i + 1 }}</span>
+                  </div>
+                  <div class="performer-info">
+                    <div class="performer-name">{{ performer.fullName }}</div>
+                    <div class="performer-stats">
+                      {{ performer.completedTasks }}/{{ performer.totalTasks }} tâches
+                    </div>
+                  </div>
+                  <div class="performer-rate">
+                    <span class="rate-value">{{ performer.completionRate }}%</span>
+                    <mat-progress-bar mode="determinate" [value]="performer.completionRate" 
+                                    [color]="i === 0 ? 'primary' : 'accent'"></mat-progress-bar>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        
+        <!-- Pending Tasks -->
+        <div class="pending-tasks-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <mat-icon>pending_actions</mat-icon>
+              Tâches en Attente
+            </h2>
+            <button mat-icon-button routerLink="/tasks" matTooltip="Voir toutes les tâches">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
+          
+          <mat-card class="tasks-card">
+            <mat-card-content>
+              <div class="task-list" *ngIf="pendingTasks.length > 0; else noTasks">
+                <div class="task-item" *ngFor="let task of pendingTasks" 
+                     (click)="onViewTask(task.id)"
+                     [ngClass]="{ 'overdue': task.isOverdue }">
+                  <div class="task-priority" [ngClass]="'priority-' + (task.priority || 'medium')">
+                    <mat-icon>flag</mat-icon>
+                  </div>
+                  <div class="task-info">
+                    <div class="task-title">{{ task.title }}</div>
+                    <div class="task-assignee">{{ task.employeeName }}</div>
+                    <div class="task-due">
+                      <mat-icon>schedule</mat-icon>
+                      {{ task.dueDate | date:'dd/MM/yyyy' }}
+                    </div>
+                  </div>
+                  <div class="task-status">
+                    <mat-chip [color]="task.isOverdue ? 'warn' : 'primary'">
+                      {{ task.isOverdue ? 'En retard' : 'En cours' }}
+                    </mat-chip>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #noTasks>
+                <div class="empty-state">
+                  <mat-icon>assignment_turned_in</mat-icon>
+                  <p>Toutes les tâches sont terminées !</p>
+                </div>
+              </ng-template>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Charts - Commenté temporairement -->
+        <!-- 
+        <div class="charts-section">
+          <h2 class="section-title">
+            <mat-icon>bar_chart</mat-icon>
+            Graphiques du Département
+          </h2>
+          
+          <app-dashboard-charts 
+            [chartData]="chartData"
+            [isManager]="true"
+            [departmentName]="userDepartment?.name">
+          </app-dashboard-charts>
+        </div>
+        -->
+
+      </div>
+    </div>
+
+    <!-- Recent Activity - Commenté temporairement -->
+    <!-- 
+    <div class="activity-section">
+      <h2 class="section-title">
+        <mat-icon>history</mat-icon>
+        Activité Récente
+      </h2>
+      
+      <app-recent-tasks 
+        [tasks]="recentTasks"
+        [showDepartmentFilter]="false"
+        [departmentName]="userDepartment?.name">
+      </app-recent-tasks>
+    </div>
+    -->
+
+    <!-- Notifications - Commenté temporairement -->
+    <!-- 
+    <div class="notifications-section">
+      <h2 class="section-title">
+        <mat-icon>notifications</mat-icon>
+        Notifications
+      </h2>
+      
+      <app-notifications 
+        [isManager]="true"
+        [departmentId]="userDepartment?.id">
+      </app-notifications>
+    </div>
+    -->
+
+  </div>
+</div>

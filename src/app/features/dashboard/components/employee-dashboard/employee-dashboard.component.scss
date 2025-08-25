@@ -1,0 +1,574 @@
+/* src/app/features/dashboard/components/employee-dashboard/employee-dashboard.component.scss */
+
+.employee-dashboard {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: calc(100vh - 64px);
+
+  // En-tête du dashboard
+  .dashboard-header {
+    margin-bottom: 24px;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .welcome-section {
+        h1 {
+          margin: 0 0 8px 0;
+          color: #1976d2;
+          font-size: 2rem;
+          font-weight: 600;
+        }
+
+        .motivation-message {
+          margin: 0;
+          color: #666;
+          font-size: 1.1rem;
+          font-style: italic;
+        }
+      }
+
+      .header-actions {
+        button {
+          mat-icon {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  // Section des statistiques
+  .stats-section {
+    margin-bottom: 24px;
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+
+      .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        &.warning {
+          border-left: 4px solid #ff9800;
+        }
+
+        &.progress-card {
+          border-left: 4px solid #9c27b0;
+        }
+
+        .stat-content {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+
+          .stat-icon {
+            padding: 12px;
+            border-radius: 50%;
+            background: #e3f2fd;
+
+            &.success {
+              background: #e8f5e8;
+            }
+
+            &.warning {
+              background: #fff3e0;
+            }
+
+            &.progress {
+              background: #f3e5f5;
+            }
+
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          .stat-info {
+            flex: 1;
+
+            h3 {
+              margin: 0 0 4px 0;
+              font-size: 2rem;
+              font-weight: 700;
+              color: #333;
+            }
+
+            p {
+              margin: 0;
+              color: #666;
+              font-size: 0.9rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+
+            mat-progress-bar {
+              margin-top: 8px;
+              height: 6px;
+              border-radius: 3px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Carte de contenu principal
+  .content-card {
+    .dashboard-tabs {
+      ::ng-deep .mat-tab-group {
+        .mat-tab-header {
+          .mat-tab-label {
+            min-width: 120px;
+            
+            .mat-badge {
+              .mat-badge-content {
+                background: #1976d2;
+                color: white;
+                font-size: 11px;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 24px;
+
+        .tab-header {
+          margin-bottom: 24px;
+          text-align: center;
+
+          h2 {
+            margin: 0 0 8px 0;
+            color: #333;
+          }
+
+          p {
+            margin: 0;
+            color: #666;
+          }
+
+          &.warning {
+            h2 {
+              color: #f57c00;
+            }
+          }
+        }
+
+        // Table des tâches
+        .tasks-table {
+          .tasks-mat-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+            .task-row {
+              &:hover {
+                background: #fafafa;
+              }
+            }
+
+            .task-title {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              strong {
+                color: #333;
+              }
+            }
+
+            .task-description {
+              color: #666;
+              line-height: 1.4;
+            }
+
+            .due-date {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              color: #666;
+
+              mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+              }
+            }
+
+            .priority-badge {
+              display: inline-block;
+              padding: 4px 12px;
+              border-radius: 16px;
+              color: white;
+              font-size: 0.8rem;
+              font-weight: 500;
+              text-transform: uppercase;
+            }
+
+            .task-actions {
+              display: flex;
+              gap: 8px;
+              align-items: center;
+
+              button {
+                mat-icon {
+                  margin-right: 4px;
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+                }
+              }
+            }
+          }
+        }
+
+        // Cartes de tâches (pour aujourd'hui et en retard)
+        .today-tasks,
+        .overdue-tasks {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          gap: 20px;
+
+          .task-card {
+            mat-card {
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+              &:hover {
+                transform: translateY(-2px);          
+                shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            }
+
+            mat-card-content {
+              padding: 16px;
+            }
+        }
+
+            .task-title {
+              font-size: 1.2rem;
+              font-weight: 500;
+              color: #333;
+              margin-bottom: 8px;
+            }
+
+            .task-description {
+              font-size: 0.9rem;
+              color: #666;
+              margin-bottom: 12px;
+              line-height: 1.4;
+              max-height: 60px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .task-meta {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+
+              .due-date {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.85rem;
+                color: #666;
+
+                mat-icon {
+                  font-size: 16px;
+                  width: 16px;
+                  height: 16px;
+                  color: #ff9800;
+                }
+              }
+
+              .priority-badge {
+                padding: 4px 12px;
+                border-radius: 16px;
+                color: white;
+                font-size: 0.8rem;
+                font-weight: 500;
+                text-transform: uppercase;
+
+                &.high {
+                  background: #f44336;
+                }
+
+                &.medium {
+                  background: #ff9800;
+                }
+
+                &.low {
+                  background: #4caf50;
+                }
+              }
+            }
+
+            .task-actions {
+              display: flex;
+              justify-content: flex-end;
+              gap: 8px;
+
+              button {
+                mat-icon {
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+                }
+
+                &.complete-btn {
+                  color: #4caf50;
+                }
+
+                &.details-btn {
+                  color: #1976d2;
+                }
+              }
+            }
+          }
+        }
+
+        // Style pour les tâches en retard
+        .overdue-tasks {
+          .task-card {
+            mat-card {
+              border-left: 4px solid #f44336;
+
+              .task-title {
+                color: #f44336;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Modal pour les détails ou l'édition des tâches
+  .task-dialog {
+    .mat-mdc-dialog-container {
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .dialog-header {
+      background: #1976d2;
+      color: white;
+      padding: 16px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+      }
+
+      button {
+        color: white;
+      }
+    }
+
+    .dialog-content {
+      padding: 16px;
+
+      .form-field {
+        width: 100%;
+        margin-bottom: 16px;
+
+        mat-label {
+          color: #333;
+          font-weight: 500;
+        }
+
+        mat-error {
+          font-size: 0.8rem;
+        }
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 16px;
+
+        button {
+          &.save-btn {
+            background: #1976d2;
+            color: white;
+          }
+
+          &.cancel-btn {
+            background: #f44336;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  // État de chargement
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    mat-spinner {
+      ::ng-deep .mat-mdc-progress-spinner circle {
+        stroke: #1976d2;
+      }
+    }
+  }
+
+  // Message d'erreur
+  .error-message {
+    background: #f44336;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  // État vide
+  .empty-state {
+    text-align: center;
+    padding: 24px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    color: #666;
+    font-size: 1rem;
+    font-style: italic;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+  }
+
+  // Ajustements responsifs
+  @media (max-width: 768px) {
+    padding: 16px;
+    min-height: calc(100vh - 56px);
+
+    .dashboard-header {
+      .header-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+
+        .welcome-section {
+          h1 {
+            font-size: 1.5rem;
+          }
+
+          .motivation-message {
+            font-size: 0.9rem;
+          }
+        }
+
+        .header-actions {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+        }
+      }
+    }
+
+    .stats-section {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .content-card {
+      .dashboard-tabs {
+        ::ng-deep .mat-tab-group {
+          .mat-tab-header {
+            .mat-tab-label {
+              min-width: 80px;
+              font-size: 0.9rem;
+            }
+          }
+        }
+
+        .tab-content {
+          .today-tasks,
+          .overdue-tasks {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tasks-table {
+      .tasks-mat-table {
+        .task-row {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+
+          .task-title,
+          .task-description,
+          .due-date,
+          .priority-badge,
+          .task-actions {
+            width: 100%;
+            text-align: left;
+          }
+
+          .task-actions {
+            justify-content: flex-start;
+          }
+        }
+      }
+    }
+  }
+}
