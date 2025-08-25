@@ -1,0 +1,14 @@
+main {
+  min-height: 100vh;
+  
+  &.with-navbar {
+    padding-top: 0; // La navbar est sticky donc pas besoin de padding
+  }
+}
+
+// Style global pour l'application
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

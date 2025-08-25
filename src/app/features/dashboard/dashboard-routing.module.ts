@@ -1,18 +1,19 @@
-// src/app/features/dashboard/dashboard-routing.module.ts
+// src/app/features/dashboard/dashboard-routing.module.ts - Version corrigée
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RoleGuard } from '../../core/guards/role.guard';
 import { UserRole } from '../../core/models/user.model';
 
-// Import des composants (créez-les s'ils n'existent pas encore)
+// Import des composants
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { ManagerDashboardComponent } from './components/manager-dashboard/manager-dashboard.component';
 import { EmployeeDashboardComponent } from './components/employee-dashboard/employee-dashboard.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component'; // Composant de redirection
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'employee', // Redirection par défaut vers employee
+    component: DashboardComponent, // Composant qui redirige selon le rôle
     pathMatch: 'full'
   },
   {

@@ -101,6 +101,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // Remplacez la méthode redirectAfterLogin dans login.component.ts
 
+// Dans login.component.ts - Méthode redirectAfterLogin corrigée
+
 private redirectAfterLogin(): void {
   const currentUser = this.authService.getCurrentUser();
   if (!currentUser) {
@@ -116,27 +118,11 @@ private redirectAfterLogin(): void {
   this.isLoading = false;
   this.loadingService.hide();
 
-  // Redirection basée sur le rôle si pas d'URL de retour spécifique
-  if (this.returnUrl === '/dashboard') {
-    switch (currentUser.role) {
-      case UserRole.ADMIN:
-        console.log('Redirection vers admin dashboard');
-        // CORRECTION: Utiliser les routes définies dans dashboard-routing
-        this.router.navigate(['/dashboard/admin'], { replaceUrl: true });
-        break;
-      case UserRole.MANAGER:
-        console.log('Redirection vers manager dashboard');
-        this.router.navigate(['/dashboard/manager'], { replaceUrl: true });
-        break;
-      case UserRole.EMPLOYE:
-        console.log('Redirection vers employee dashboard');
-        this.router.navigate(['/dashboard/employee'], { replaceUrl: true });
-        break;
-      default:
-        console.log('Redirection vers dashboard général (employee par défaut)');
-        this.router.navigate(['/dashboard/employee'], { replaceUrl: true });
-        break;
-    }
+  // CORRECTION : Utiliser simplement '/dashboard' 
+  // Le DashboardComponent se chargera de rediriger selon le rôle
+  if (this.returnUrl === '/dashboard' || this.returnUrl === '/') {
+    console.log('Redirection vers dashboard - sera redirigé selon le rôle');
+    this.router.navigate(['/dashboard'], { replaceUrl: true });
   } else {
     console.log('Redirection vers URL de retour:', this.returnUrl);
     this.router.navigateByUrl(this.returnUrl, { replaceUrl: true });

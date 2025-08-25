@@ -1,0 +1,37 @@
+<!-- src/app/shared/components/navbar/navbar.component.html -->
+<mat-toolbar color="primary" class="navbar">
+  <span class="navbar-title">
+    <mat-icon>business</mat-icon>
+    Application RH
+  </span>
+  
+  <span class="navbar-spacer"></span>
+  
+  <div class="user-info" *ngIf="currentUser">
+    <mat-icon>person</mat-icon>
+    <span class="user-name">{{ currentUser.fullName }}</span>
+    <mat-chip class="role-chip" [color]="getRoleColor(currentUser.role)">
+      {{ getRoleDisplayName(currentUser.role) }}
+    </mat-chip>
+  </div>
+  
+  <button mat-icon-button [matMenuTriggerFor]="userMenu" *ngIf="currentUser">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="navigateToDashboard()">
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </button>
+    <button mat-menu-item (click)="navigateToProfile()">
+      <mat-icon>account_circle</mat-icon>
+      <span>Profil</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()" class="logout-button">
+      <mat-icon>logout</mat-icon>
+      <span>Se déconnecter</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

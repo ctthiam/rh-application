@@ -1,0 +1,74 @@
+/* src/app/shared/components/navbar/navbar.component.scss */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 1.2rem;
+  
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.navbar-spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  
+  mat-icon {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.user-name {
+  font-weight: 500;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.role-chip {
+  font-size: 11px;
+  font-weight: 500;
+  min-height: 22px;
+  border-radius: 11px;
+}
+
+.logout-button {
+  color: #f44336 !important;
+  
+  mat-icon {
+    color: #f44336 !important;
+  }
+  
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+  }
+}
+
+// Style pour mobile
+@media (max-width: 768px) {
+  .user-info {
+    .user-name {
+      display: none; // Cacher le nom sur mobile
+    }
+  }
+  
+  .navbar-title {
+    font-size: 1rem;
+  }
+}
