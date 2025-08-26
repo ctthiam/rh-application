@@ -1,4 +1,4 @@
-// 2. src/app/app.routes.ts (version corrigée pour les composants standalone)
+// src/app/app.routes.ts (mise à jour avec les routes des employés)
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
@@ -25,42 +25,94 @@ export const routes: Routes = [
     loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
   },
 
-  // // Routes pour les employés (tous les utilisateurs connectés) - Version standalone
-  // {
-  //   path: 'employees',
-  //   canActivate: [AuthGuard],
-  //   loadComponent: () => import('./features/employees/employees.component').then(c => c.EmployeesComponent)
-  // },
+  // Routes pour les employés (ADMIN et MANAGER)
+  {
+    path: 'employees',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/employees/employees.component').then(c => c.EmployeesComponent)
+      },
+      {
+        path: 'create',
+        loadComponent: () => import('./features/employees/components/employee-form/employee-form.component').then(c => c.EmployeeFormComponent),
+        data: { mode: 'create' }
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/employees/components/employee-details/employee-details.component').then(c => c.EmployeeDetailsComponent)
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./features/employees/components/employee-form/employee-form.component').then(c => c.EmployeeFormComponent),
+        data: { mode: 'edit' }
+      }
+    ]
+  },
 
-  // // Routes pour les tâches (tous les utilisateurs connectés) - Version standalone
-  // {
-  //   path: 'tasks',
-  //   canActivate: [AuthGuard],
-  //   loadComponent: () => import('./features/tasks/tasks.component').then(c => c.TasksComponent)
-  // },
+  // Routes pour les tâches (tous les utilisateurs connectés)
+  {
+    path: 'tasks',
+    canActivate: [AuthGuard],
+    children: [
+      // {
+      //   path: '',
+      //   loadComponent: () => import('./features/tasks/tasks.component').then(c => c.TasksComponent)
+      // },
+      // {
+      //   path: 'my-tasks',
+      //   loadComponent: () => import('./features/tasks/components/my-tasks/my-tasks.component').then(c => c.MyTasksComponent)
+      // },
+      // {
+      //   path: 'create',
+      //   canActivate: [RoleGuard],
+      //   data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
+      //   loadComponent: () => import('./features/tasks/components/task-form/task-form.component').then(c => c.TaskFormComponent)
+      // }
+    ]
+  },
 
-  // // Routes pour les départements (ADMIN et MANAGER uniquement) - Version standalone
-  // {
-  //   path: 'departments',
-  //   canActivate: [AuthGuard, RoleGuard],
-  //   data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
-  //   loadComponent: () => import('./features/departments/departments.component').then(c => c.DepartmentsComponent)
-  // },
+  // Routes pour les départements (ADMIN et MANAGER)
+  {
+    path: 'departments',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
+    children: [
+      // {
+      //   path: '',
+      //   loadComponent: () => import('./features/departments/departments.component').then(c => c.DepartmentsComponent)
+      // },
+      // {
+      //   path: 'create',
+      //   canActivate: [RoleGuard],
+      //   data: { roles: [UserRole.ADMIN] },
+      //   loadComponent: () => import('./features/departments/components/department-form/department-form.component').then(c => c.DepartmentFormComponent)
+      // }
+    ]
+  },
 
-  // Routes d'administration (ADMIN uniquement) - Version standalone
+  // Routes d'administration (ADMIN uniquement)
   {
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: [UserRole.ADMIN] },
-    loadComponent: () => import('./features/dashboard/components/admin-dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/dashboard/components/admin-dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
+      },
+      // {
+      //   path: 'users',
+      //   loadComponent: () => import('./features/admin/components/user-management/user-management.component').then(c => c.UserManagementComponent)
+      // },
+      // {
+      //   path: 'settings',
+      //   loadComponent: () => import('./features/admin/components/system-settings/system-settings.component').then(c => c.SystemSettingsComponent)
+      // }
+    ]
   },
-
-  // // Route de profil utilisateur - Version standalone
-  // {
-  //   path: 'profile',
-  //   canActivate: [AuthGuard],
-  //   loadComponent: () => import('./features/profile/profile.component').then(c => c.ProfileComponent)
-  // },
 
   // Page d'erreur 404
   {

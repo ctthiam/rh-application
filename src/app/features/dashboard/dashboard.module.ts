@@ -29,7 +29,6 @@ import { NotificationsComponent } from './components/notifications/notifications
 
 @NgModule({
   declarations: [
-    AdminDashboardComponent,
     ManagerDashboardComponent,
     EmployeeDashboardComponent,
     NotificationsComponent,
@@ -39,7 +38,7 @@ import { NotificationsComponent } from './components/notifications/notifications
     
     // IMPORTANT: Ajouter le routing module ici
     DashboardRoutingModule,
-    
+    AdminDashboardComponent,
     // Angular Material
     MatCardModule,
     MatIconModule,

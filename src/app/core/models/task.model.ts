@@ -1,6 +1,8 @@
 export enum TaskStatus {
   EN_COURS = 1,
-  TERMINE = 2
+  TERMINE = 2,
+  EN_RETARD = 3,
+  ANNULE = 4
 }
 
 export interface Task {
