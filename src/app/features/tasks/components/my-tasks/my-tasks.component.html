@@ -1,0 +1,245 @@
+<!-- src/app/features/tasks/components/my-tasks/my-tasks.component.html -->
+<div class="my-tasks-container">
+  <!-- Header avec message motivationnel -->
+  <div class="header-section">
+    <div class="welcome-message">
+      <h1 class="mat-h1">
+        <mat-icon>assignment_ind</mat-icon>
+        Mes Tâches
+      </h1>
+      <div class="motivation-card">
+        <mat-icon class="motivation-icon">emoji_events</mat-icon>
+        <p class="motivation-text">{{ getMotivationalMessage() }}</p>
+        <div class="progress-indicator">
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="getProgressPercentage()"
+            color="accent">
+          </mat-progress-bar>
+          <span class="progress-text">{{ getProgressPercentage() }}% terminé</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques rapides -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card total" [class.active]="activeFilter === 'all'">
+        <div class="stat-content" (click)="setFilter('all')">
+          <mat-icon>assignment</mat-icon>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.total }}</div>
+            <div class="stat-label">Total</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card pending" [class.active]="activeFilter === 'pending'">
+        <div class="stat-content" (click)="setFilter('pending')">
+          <mat-icon>pending</mat-icon>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.pending }}</div>
+            <div class="stat-label">En cours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card completed" [class.active]="activeFilter === 'completed'">
+        <div class="stat-content" (click)="setFilter('completed')">
+          <mat-icon>check_circle</mat-icon>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.completed }}</div>
+            <div class="stat-label">Terminées</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card overdue" [class.active]="activeFilter === 'overdue'" *ngIf="stats.overdue > 0">
+        <div class="stat-content" (click)="setFilter('overdue')">
+          <mat-icon>warning</mat-icon>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.overdue }}</div>
+            <div class="stat-label">En retard</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card today" [class.active]="activeFilter === 'today'" *ngIf="stats.today > 0">
+        <div class="stat-content" (click)="setFilter('today')">
+          <mat-icon>today</mat-icon>
+          <div class="stat-info">
+            <div class="stat-number">{{ stats.today }}</div>
+            <div class="stat-label">Aujourd'hui</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre d'outils -->
+  <div class="toolbar-section">
+    <mat-card class="toolbar-card">
+      <mat-card-content>
+        <div class="toolbar-content">
+          <!-- Filtres -->
+          <div class="filter-tabs">
+            <button 
+              mat-button 
+              *ngFor="let filter of filterOptions"
+              [class.active-filter]="activeFilter === filter.value"
+              (click)="setFilter(filter.value)"
+              class="filter-tab">
+              <mat-icon>{{ filter.icon }}</mat-icon>
+              {{ filter.label }}
+            </button>
+          </div>
+
+          <!-- Recherche et actions -->
+          <div class="search-actions">
+           <!-- Correction pour la ligne 102 - Type safety pour l'event -->
+<!-- Correction pour la ligne 102 - Type safety pour l'event -->
+<mat-form-field appearance="outline" class="search-field">
+  <mat-label>Rechercher...</mat-label>
+  <input matInput (input)="onSearch($any($event.target).value || '')" placeholder="Titre ou description">
+  <mat-icon matPrefix>search</mat-icon>
+</mat-form-field>
+
+            <button 
+              mat-icon-button 
+              (click)="refreshTasks()"
+              matTooltip="Actualiser">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement de vos tâches...</p>
+  </div>
+
+  <!-- Liste des tâches -->
+  <div class="tasks-section" *ngIf="!isLoading">
+    <!-- Message si aucune tâche -->
+    <div class="no-tasks" *ngIf="filteredTasks.length === 0 && !isLoading">
+      <mat-icon class="no-tasks-icon">assignment_turned_in</mat-icon>
+      <h3>{{ activeFilter === 'all' ? 'Aucune tâche assignée' : 'Aucune tâche dans ce filtre' }}</h3>
+      <p>{{ activeFilter === 'completed' ? 'Vous n\'avez pas encore terminé de tâches.' : 'Profitez de ce moment libre !' }}</p>
+    </div>
+
+    <!-- Grille des tâches -->
+    <div class="tasks-grid" *ngIf="filteredTasks.length > 0">
+      <!-- Correction pour la ligne 136 - trackBy function -->
+<mat-card 
+  *ngFor="let task of filteredTasks; trackBy: trackByTaskId" 
+  class="task-card"
+  [class]="getUrgencyClass(task)"
+  [class.completed]="task.status === 2">
+        
+        <!-- En-tête de la tâche -->
+        <mat-card-header>
+          <div class="task-header">
+            <div class="task-title-section">
+              <h3 class="task-title" [class.completed-title]="task.status === 2">
+                {{ task.title }}
+              </h3>
+              <div class="task-meta">
+                <mat-chip 
+                  class="priority-chip"
+                  [style.background-color]="getPriorityColor(task.priority)"
+                  [style.color]="'white'">
+                  <mat-icon>{{ getPriorityIcon(task.priority) }}</mat-icon>
+                  {{ task.priority }}
+                </mat-chip>
+                <mat-chip 
+                  class="status-chip"
+                  [color]="getStatusColor(task.status)">
+                  {{ getStatusLabel(task.status) }}
+                </mat-chip>
+              </div>
+            </div>
+            
+            <!-- Action rapide -->
+            <div class="task-actions" *ngIf="task.status !== 2">
+              <button 
+                mat-fab 
+                color="accent"
+                class="complete-btn"
+                (click)="completeTask(task)"
+                matTooltip="Marquer comme terminé">
+                <mat-icon>check</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <!-- Contenu de la tâche -->
+        <mat-card-content>
+          <p class="task-description" *ngIf="task.description">
+            {{ task.description }}
+          </p>
+
+          <!-- Informations temporelles -->
+          <div class="task-timing">
+            <div class="timing-info" [class]="getUrgencyClass(task)">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatDueDate(task) }}</span>
+            </div>
+            
+            <div class="department-info" *ngIf="task.departmentName">
+              <mat-icon>business</mat-icon>
+              <span>{{ task.departmentName }}</span>
+            </div>
+          </div>
+
+          <!-- Barre de progression visuelle pour les tâches urgentes -->
+          <div class="urgency-indicator" *ngIf="task.isOverdue || task.isDueToday">
+            <div class="urgency-bar" [class.overdue]="task.isOverdue" [class.today]="task.isDueToday"></div>
+            <span class="urgency-text">
+              {{ task.isOverdue ? 'ACTION REQUISE' : 'À FAIRE AUJOURD\'HUI' }}
+            </span>
+          </div>
+        </mat-card-content>
+
+        <!-- Footer avec informations supplémentaires -->
+        <mat-card-actions *ngIf="task.status === 2">
+          <div class="completed-info">
+            <mat-icon>check_circle</mat-icon>
+            <span>Terminé {{ task.completedAt | date:'short' }}</span>
+          </div>
+        </mat-card-actions>
+
+        <!-- Indicateur visuel de priorité -->
+        <div class="priority-indicator" [style.background-color]="getPriorityColor(task.priority)"></div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Actions flottantes -->
+  <div class="floating-actions" *ngIf="stats.overdue > 0 || stats.today > 0">
+    <button 
+      mat-fab 
+      color="warn"
+      class="urgent-tasks-btn"
+      *ngIf="stats.overdue > 0"
+      (click)="setFilter('overdue')"
+      matTooltip="{{ stats.overdue }} tâche(s) en retard">
+      <mat-icon matBadge="{{ stats.overdue }}" matBadgeColor="accent">warning</mat-icon>
+    </button>
+
+    <button 
+      mat-fab 
+      color="primary"
+      class="today-tasks-btn"
+      *ngIf="stats.today > 0 && stats.overdue === 0"
+      (click)="setFilter('today')"
+      matTooltip="{{ stats.today }} tâche(s) pour aujourd'hui">
+      <mat-icon matBadge="{{ stats.today }}" matBadgeColor="accent">today</mat-icon>
+    </button>
+  </div>
+</div>

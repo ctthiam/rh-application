@@ -1,0 +1,530 @@
+/* src/app/features/tasks/components/task-form/task-form.component.scss */
+
+.task-form-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+}
+
+/* Header */
+.form-header {
+  margin-bottom: 32px;
+  text-align: center;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 8px 0;
+    color: #1976d2;
+    font-weight: 500;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .form-subtitle {
+    margin: 0;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+/* Formulaire */
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .form-section {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    &.preview-section {
+      border: 2px solid #e3f2fd;
+      background-color: #fafffe;
+    }
+
+    mat-card-header {
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #1976d2;
+        font-size: 18px;
+        margin-bottom: 0;
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    mat-card-content {
+      padding-top: 16px !important;
+    }
+  }
+
+  // Layout des champs
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .full-width {
+      flex: 1;
+    }
+
+    .half-width {
+      flex: 0.5;
+    }
+  }
+
+  // Styles des champs
+  mat-form-field {
+    &.full-width {
+      width: 100%;
+    }
+
+    // Messages d'erreur personnalisés
+    mat-error {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    // Indices et compteurs
+    mat-hint {
+      font-size: 12px;
+      
+      &[align="end"] {
+        text-align: right;
+      }
+    }
+  }
+
+  // Options dans les selects
+  .employee-option {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+
+    .employee-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .employee-position {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+  }
+
+  .priority-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+/* Suggestions de dates */
+.date-suggestions {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+
+  .suggestions-title {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .suggestion-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .suggestion-btn {
+      font-size: 12px;
+      padding: 4px 12px;
+      min-width: auto;
+      height: 32px;
+      border-radius: 16px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #e3f2fd;
+        border-color: #2196f3;
+        color: #1976d2;
+      }
+    }
+  }
+}
+
+/* Aperçu de la tâche */
+.task-preview {
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .preview-title {
+      margin: 0;
+      color: #333;
+      font-size: 18px;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    mat-chip {
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .preview-description {
+    margin: 0 0 16px 0;
+    color: #666;
+    line-height: 1.5;
+    font-size: 14px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #2196f3;
+  }
+
+  .preview-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .preview-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: #999;
+      }
+    }
+  }
+}
+
+/* Actions du formulaire */
+.form-actions {
+  position: sticky;
+  bottom: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+  margin-top: 32px;
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      min-width: 120px;
+      height: 40px;
+
+      mat-spinner {
+        margin-right: 8px;
+      }
+
+      &[type="submit"] {
+        font-weight: 500;
+        min-width: 140px;
+      }
+    }
+  }
+
+  .form-validation-status {
+    .validation-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+
+      &.valid {
+        background-color: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+
+        mat-icon {
+          color: #4caf50;
+        }
+      }
+
+      &.invalid {
+        background-color: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
+
+        mat-icon {
+          color: #f44336;
+        }
+      }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+/* États de validation des champs */
+.mat-mdc-form-field {
+  &.mat-form-field-invalid {
+    .mat-mdc-form-field-outline-thick {
+      color: #f44336;
+    }
+  }
+
+  &.ng-valid.ng-touched {
+    .mat-mdc-form-field-outline-thick {
+      color: #4caf50;
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .task-form-container {
+    padding: 16px;
+  }
+
+  .form-header {
+    margin-bottom: 24px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .form-subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .task-form {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+
+      .half-width {
+        flex: 1;
+      }
+    }
+
+    .form-section {
+      mat-card-header {
+        mat-card-title {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .date-suggestions {
+    .suggestion-buttons {
+      .suggestion-btn {
+        flex: 1;
+        min-width: calc(50% - 4px);
+      }
+    }
+  }
+
+  .task-preview {
+    .preview-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .form-actions {
+    position: static;
+    margin-top: 24px;
+
+    .action-buttons {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .task-form-container {
+    padding: 12px;
+  }
+
+  .date-suggestions {
+    .suggestion-buttons {
+      .suggestion-btn {
+        width: 100%;
+        margin-bottom: 4px;
+      }
+    }
+  }
+}
+
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.task-form-container {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.form-section {
+  animation: slideInUp 0.3s ease-out;
+  animation-delay: calc(var(--index) * 0.1s);
+}
+
+/* Mode sombre (si nécessaire) */
+@media (prefers-color-scheme: dark) {
+  .date-suggestions {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #e0e0e0;
+
+    .suggestions-title {
+      color: #e0e0e0;
+    }
+  }
+
+  .task-preview {
+    .preview-description {
+      background-color: #2d2d2d;
+      color: #e0e0e0;
+    }
+  }
+
+  .form-actions {
+    background-color: #1e1e1e;
+    border-color: #404040;
+  }
+}
+
+/* Focus et accessibilité */
+.mat-mdc-form-field:focus-within {
+  .mat-mdc-form-field-outline-thick {
+    color: #2196f3;
+  }
+}
+
+/* Transitions fluides */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Amélioration de l'UX */
+.suggestion-btn:active {
+  transform: scale(0.95);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* États disabled */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Scroll smooth pour les grandes formes */
+.task-form-container {
+  scroll-behavior: smooth;
+}

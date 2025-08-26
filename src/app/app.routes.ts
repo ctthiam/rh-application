@@ -1,4 +1,4 @@
-// src/app/app.routes.ts (mise à jour avec les routes des départements)
+// src/app/app.routes.ts (mise à jour complète avec gestion des tâches)
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
@@ -64,22 +64,7 @@ export const routes: Routes = [
   {
     path: 'tasks',
     canActivate: [AuthGuard],
-    children: [
-      // {
-      //   path: '',
-      //   loadComponent: () => import('./features/tasks/tasks.component').then(c => c.TasksComponent)
-      // },
-      // {
-      //   path: 'my-tasks',
-      //   loadComponent: () => import('./features/tasks/components/my-tasks/my-tasks.component').then(c => c.MyTasksComponent)
-      // },
-      // {
-      //   path: 'create',
-      //   canActivate: [RoleGuard],
-      //   data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
-      //   loadComponent: () => import('./features/tasks/components/task-form/task-form.component').then(c => c.TaskFormComponent)
-      // }
-    ]
+    loadChildren: () => import('./features/tasks/tasks.module').then(m => m.TasksModule)
   },
 
   // Routes d'administration (ADMIN uniquement)
@@ -91,7 +76,15 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./features/dashboard/components/admin-dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
-      }
+      },
+      // {
+      //   path: 'users',
+      //   loadComponent: () => import('./features/users/users.component').then(c => c.UsersComponent)
+      // },
+      // {
+      //   path: 'settings',
+      //   loadComponent: () => import('./features/admin/settings/settings.component').then(c => c.SettingsComponent)
+      // }
     ]
   },
 

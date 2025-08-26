@@ -1,10 +1,10 @@
-// src/app/core/models/task.model.ts (corrigé)
+// src/app/core/models/task.model.ts (version corrigée)
 export interface Task {
   id: number;
   title: string;
   description: string;
   dueDate: Date;
-  status: TaskStatus; // Utilise l'enum au lieu de number
+  status: TaskStatus;
   priority: TaskPriority;
   assignedToId: number;
   assignedToName: string;
@@ -15,7 +15,9 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
   completedAt?: Date;
-  isOverdue?: boolean; // Ajouté comme propriété calculée
+  isOverdue?: boolean;
+  isDueToday?: boolean; // PROPRIÉTÉ AJOUTÉE
+  daysUntilDue?: number; // PROPRIÉTÉ AJOUTÉE POUR UTILITÉ
 }
 
 export enum TaskStatus {

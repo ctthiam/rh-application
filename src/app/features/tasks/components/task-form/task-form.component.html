@@ -1,0 +1,304 @@
+<!-- src/app/features/tasks/components/task-form/task-form.component.html -->
+<div class="task-form-container">
+  <!-- Header -->
+  <div class="form-header">
+    <h1 class="mat-h1">
+      <mat-icon>{{ isEditMode ? 'edit' : 'add_task' }}</mat-icon>
+      {{ isEditMode ? 'Modifier la Tâche' : 'Nouvelle Tâche' }}
+    </h1>
+    <p class="form-subtitle">
+      {{ isEditMode ? 'Modifiez les détails de la tâche' : 'Créez une nouvelle tâche pour votre équipe' }}
+    </p>
+  </div>
+
+  <!-- Loader -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <p>{{ isEditMode ? 'Chargement de la tâche...' : 'Chargement...' }}</p>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="task-form">
+    <div class="form-content">
+      <!-- Informations de base -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>info</mat-icon>
+            Informations générales
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <!-- Titre -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Titre de la tâche *</mat-label>
+              <input 
+                matInput 
+                formControlName="title"
+                placeholder="Ex: Développer la nouvelle fonctionnalité"
+                maxlength="100"
+                (input)="onTitleInput()">
+              <mat-hint align="end">{{ form.get('title')?.value?.length || 0 }}/100</mat-hint>
+              <mat-error *ngIf="isFieldInvalid('title')">
+                {{ getFieldError('title') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <!-- Description -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description *</mat-label>
+              <textarea 
+                matInput 
+                formControlName="description"
+                placeholder="Décrivez en détail ce qui doit être accompli..."
+                rows="4"
+                maxlength="500"
+                (input)="onDescriptionInput()">
+              </textarea>
+              <mat-hint align="end">{{ form.get('description')?.value?.length || 0 }}/500</mat-hint>
+              <mat-error *ngIf="isFieldInvalid('description')">
+                {{ getFieldError('description') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Assignation et départements -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>people</mat-icon>
+            Assignation
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row" *ngIf="isAdmin && departments.length > 0">
+            <!-- Département (si admin) -->
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Département</mat-label>
+              <mat-select formControlName="departmentId">
+                <mat-option value="">Tous les départements</mat-option>
+                <mat-option *ngFor="let dept of departments" [value]="dept.id">
+                  {{ dept.name }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="getSelectedDepartmentName()">
+                Sélectionné: {{ getSelectedDepartmentName() }}
+              </mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <!-- Employé assigné -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Assigner à *</mat-label>
+              <mat-select formControlName="assignedToId">
+                <mat-option value="">Sélectionner un employé</mat-option>
+                <mat-option *ngFor="let employee of filteredEmployees" [value]="employee.id">
+                  <div class="employee-option">
+                    <span class="employee-name">{{ employee.fullName }}</span>
+                    <span class="employee-position">{{ employee.position }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="getSelectedEmployeeName()">
+                Assigné à: {{ getSelectedEmployeeName() }}
+              </mat-hint>
+              <mat-error *ngIf="isFieldInvalid('assignedToId')">
+                {{ getFieldError('assignedToId') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Priorité et échéance -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>schedule</mat-icon>
+            Priorité et Échéance
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <!-- Priorité -->
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Priorité *</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option *ngFor="let priority of priorityOptions" [value]="priority.value">
+                  <div class="priority-option">
+                    <mat-icon [style.color]="priority.color">flag</mat-icon>
+                    {{ priority.label }}
+                  </div>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Date limite -->
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Date limite *</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="dueDatePicker" 
+                formControlName="dueDate"
+                (dateChange)="suggestPriorityBasedOnDueDate()">
+              <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #dueDatePicker></mat-datepicker>
+              <mat-error *ngIf="isFieldInvalid('dueDate')">
+                {{ getFieldError('dueDate') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Suggestions de dates -->
+          <div class="date-suggestions">
+            <p class="suggestions-title">Suggestions rapides:</p>
+            <div class="suggestion-buttons">
+              <button 
+                type="button" 
+                mat-stroked-button 
+                (click)="suggestDueDate(1)"
+                class="suggestion-btn">
+                Demain
+              </button>
+              <button 
+                type="button" 
+                mat-stroked-button 
+                (click)="suggestDueDate(7)"
+                class="suggestion-btn">
+                Dans une semaine
+              </button>
+              <button 
+                type="button" 
+                mat-stroked-button 
+                (click)="suggestDueDate(14)"
+                class="suggestion-btn">
+                Dans 2 semaines
+              </button>
+              <button 
+                type="button" 
+                mat-stroked-button 
+                (click)="suggestDueDate(30)"
+                class="suggestion-btn">
+                Dans un mois
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Statut (en mode édition) -->
+      <mat-card class="form-section" *ngIf="isEditMode">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>track_changes</mat-icon>
+            Statut
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Statut de la tâche</mat-label>
+              <mat-select formControlName="status">
+                <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                  {{ status.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Aperçu de la tâche -->
+      <mat-card class="form-section preview-section" *ngIf="form.get('title')?.value">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>preview</mat-icon>
+            Aperçu
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="task-preview">
+            <div class="preview-header">
+              <h3 class="preview-title">{{ form.get('title')?.value }}</h3>
+              <mat-chip 
+                *ngIf="form.get('priority')?.value"
+                [style.background-color]="getPriorityColor(form.get('priority')?.value)"
+                [style.color]="'white'">
+                <mat-icon>flag</mat-icon>
+                {{ form.get('priority')?.value }}
+              </mat-chip>
+            </div>
+
+            <p class="preview-description" *ngIf="form.get('description')?.value">
+              {{ form.get('description')?.value }}
+            </p>
+
+            <div class="preview-details">
+              <div class="preview-detail" *ngIf="getSelectedEmployeeName()">
+                <mat-icon>person</mat-icon>
+                <span>Assigné à: {{ getSelectedEmployeeName() }}</span>
+              </div>
+              
+              <div class="preview-detail" *ngIf="form.get('dueDate')?.value">
+                <mat-icon>schedule</mat-icon>
+                <span>Échéance: {{ form.get('dueDate')?.value | date:'fullDate' }}</span>
+              </div>
+
+              <div class="preview-detail" *ngIf="getSelectedDepartmentName()">
+                <mat-icon>business</mat-icon>
+                <span>Département: {{ getSelectedDepartmentName() }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <div class="action-buttons">
+        <button 
+          type="button" 
+          mat-button 
+          (click)="onCancel()"
+          [disabled]="isSubmitting">
+          <mat-icon>cancel</mat-icon>
+          Annuler
+        </button>
+
+        <button 
+          type="button" 
+          mat-stroked-button 
+          (click)="onReset()"
+          [disabled]="isSubmitting">
+          <mat-icon>refresh</mat-icon>
+          Réinitialiser
+        </button>
+
+        <button 
+          type="submit" 
+          mat-raised-button 
+          color="primary"
+          [disabled]="form.invalid || isSubmitting">
+          <mat-spinner diameter="16" *ngIf="isSubmitting"></mat-spinner>
+          <mat-icon *ngIf="!isSubmitting">{{ isEditMode ? 'save' : 'add_task' }}</mat-icon>
+          {{ isEditMode ? 'Modifier' : 'Créer' }} la Tâche
+        </button>
+      </div>
+
+      <!-- Indicateur de validation -->
+      <div class="form-validation-status" *ngIf="form.touched">
+        <div class="validation-indicator" [class.valid]="form.valid" [class.invalid]="form.invalid">
+          <mat-icon>{{ form.valid ? 'check_circle' : 'error' }}</mat-icon>
+          <span>{{ form.valid ? 'Formulaire valide' : 'Veuillez corriger les erreurs' }}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
