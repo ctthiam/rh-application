@@ -72,12 +72,27 @@
           </form>
         </mat-card-content>
 
-        <!-- Pied de carte avec informations -->
-        <mat-card-actions MatCardActions.align="center">
+        <!-- Actions avec lien d'inscription -->
+        <mat-card-actions class="card-actions">
           <div class="login-help">
             <p class="help-text">
               <mat-icon class="info-icon">info</mat-icon>
               Contactez votre administrateur en cas de problème
+            </p>
+          </div>
+          
+          <!-- NOUVEAU : Lien vers l'inscription -->
+          <div class="register-link-section">
+            <p class="register-text">
+              Pas encore de compte ?
+              <button 
+                mat-button 
+                color="primary" 
+                routerLink="/auth/register"
+                [disabled]="isLoading">
+                <mat-icon>person_add</mat-icon>
+                Créer un compte
+              </button>
             </p>
           </div>
         </mat-card-actions>

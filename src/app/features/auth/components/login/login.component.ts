@@ -64,6 +64,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
+  // NOUVELLE MÉTHODE : Navigation vers la page d'inscription
+  navigateToRegister(): void {
+    this.router.navigate(['/auth/register']);
+  }
+
   private performLogin(): void {
     this.isLoading = true;
     this.loadingService.show();
@@ -99,35 +104,31 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Remplacez la méthode redirectAfterLogin dans login.component.ts
+  private redirectAfterLogin(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.error('Aucun utilisateur trouvé après connexion');
+      this.isLoading = false;
+      this.loadingService.hide();
+      return;
+    }
 
-// Dans login.component.ts - Méthode redirectAfterLogin corrigée
+    console.log('Redirection pour utilisateur:', currentUser.login, 'Rôle:', currentUser.role);
 
-private redirectAfterLogin(): void {
-  const currentUser = this.authService.getCurrentUser();
-  if (!currentUser) {
-    console.error('Aucun utilisateur trouvé après connexion');
+    // Arrêter le loading avant la redirection
     this.isLoading = false;
     this.loadingService.hide();
-    return;
+
+    // Utiliser simplement '/dashboard' 
+    // Le DashboardComponent se chargera de rediriger selon le rôle
+    if (this.returnUrl === '/dashboard' || this.returnUrl === '/') {
+      console.log('Redirection vers dashboard - sera redirigé selon le rôle');
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
+    } else {
+      console.log('Redirection vers URL de retour:', this.returnUrl);
+      this.router.navigateByUrl(this.returnUrl, { replaceUrl: true });
+    }
   }
-
-  console.log('Redirection pour utilisateur:', currentUser.login, 'Rôle:', currentUser.role);
-
-  // Arrêter le loading avant la redirection
-  this.isLoading = false;
-  this.loadingService.hide();
-
-  // CORRECTION : Utiliser simplement '/dashboard' 
-  // Le DashboardComponent se chargera de rediriger selon le rôle
-  if (this.returnUrl === '/dashboard' || this.returnUrl === '/') {
-    console.log('Redirection vers dashboard - sera redirigé selon le rôle');
-    this.router.navigate(['/dashboard'], { replaceUrl: true });
-  } else {
-    console.log('Redirection vers URL de retour:', this.returnUrl);
-    this.router.navigateByUrl(this.returnUrl, { replaceUrl: true });
-  }
-}
 
   private handleLoginError(error: any): void {
     let errorMessage = 'Une erreur est survenue lors de la connexion.';
