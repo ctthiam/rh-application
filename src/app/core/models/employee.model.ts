@@ -1,37 +1,57 @@
+// src/app/core/models/employee.model.ts (corrigé)
 export interface Employee {
   id: number;
+  firstName: string;
+  lastName: string;
   fullName: string;
+  email: string;
+  phone?: string; // Ajouté comme optionnel
   position: string;
   hireDate: Date;
   salary: number;
-  email: string;
-  phone?: string;
   departmentId: number;
   departmentName: string;
-  userId?: number;
-  userLogin?: string;
+  userId?: number; // Ajouté pour la liaison avec User
+  userLogin?: string; // Ajouté pour l'affichage
+  taskCount?: number; // Ajouté pour les statistiques
   createdAt: Date;
-  taskCount: number;
+  updatedAt: Date;
 }
 
 export interface CreateEmployeeRequest {
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  fullName: string; // Ajouté
+  email: string;
+  phone?: string; // Ajouté comme optionnel
   position: string;
   hireDate: Date;
   salary: number;
-  email: string;
-  phone?: string;
   departmentId: number;
-  userId?: number;
+  password?: string;
 }
 
 export interface UpdateEmployeeRequest {
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  fullName: string; // Ajouté
+  email: string;
+  phone?: string; // Ajouté comme optionnel
   position: string;
   hireDate: Date;
   salary: number;
-  email: string;
-  phone?: string;
   departmentId: number;
-  userId?: number;
+}
+
+export interface EmployeeStats {
+  totalEmployees: number;
+  averageSalary: number;
+  departmentDistribution: DepartmentEmployeeCount[];
+  recentHires: Employee[];
+}
+
+export interface DepartmentEmployeeCount {
+  departmentId: number;
+  departmentName: string;
+  employeeCount: number;
 }

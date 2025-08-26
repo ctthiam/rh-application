@@ -1,0 +1,209 @@
+// src/app/features/departments/departments.component.scss
+.departments-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .header-card {
+    margin-bottom: 20px;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .title-section {
+        .page-title {
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 28px;
+          font-weight: 500;
+          color: var(--primary-color);
+          
+          mat-icon {
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+          }
+        }
+        
+        .page-subtitle {
+          margin: 8px 0 0 44px;
+          color: var(--secondary-text-color);
+          font-size: 14px;
+        }
+      }
+      
+      .actions-section {
+        .create-button {
+          min-width: 180px;
+          height: 48px;
+          border-radius: 8px;
+          font-weight: 500;
+          
+          mat-icon {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .filters-card {
+    margin-bottom: 20px;
+    
+    .filters-form {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      
+      .search-field {
+        flex: 1;
+        min-width: 300px;
+      }
+      
+      .filter-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+    }
+  }
+
+  .table-card {
+    .loading-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    
+    .table-container {
+      position: relative;
+      
+      .departments-table {
+        width: 100%;
+        
+        .name-cell {
+          .department-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+            
+            .dept-icon {
+              color: var(--primary-color);
+              font-size: 20px;
+            }
+            
+            .name {
+              font-weight: 500;
+              font-size: 16px;
+            }
+          }
+          
+          .department-description {
+            color: var(--secondary-text-color);
+            font-size: 13px;
+            margin-left: 32px;
+            font-style: italic;
+          }
+        }
+        
+        .manager-cell {
+          .manager-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            
+            .manager-icon {
+              font-size: 18px;
+              color: var(--accent-color);
+            }
+            
+            .manager-name {
+              font-weight: 500;
+            }
+          }
+          
+          .manager-chip {
+            font-size: 11px;
+            height: 20px;
+            margin-left: 26px;
+          }
+        }
+        
+        .employees-cell {
+          text-align: center;
+          
+          .count-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            
+            mat-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+        
+        .date-cell {
+          color: var(--secondary-text-color);
+          font-size: 14px;
+        }
+        
+        .actions-header {
+          text-align: center;
+          width: 80px;
+        }
+        
+        .actions-cell {
+          text-align: center;
+        }
+        
+        .department-row {
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          
+          &:hover {
+            background-color: var(--hover-background);
+          }
+        }
+      }
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      
+      .no-data-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        color: var(--disabled-color);
+        margin-bottom: 16px;
+      }
+      
+      h3 {
+        color: var(--secondary-text-color);
+        margin-bottom: 8px;
+      }
+      
+      p {
+        color: var(--tertiary-text-color);
+        margin-bottom: 24px;
+      }
+    }
+    
+    .departments-paginator {
+      border-top: 1px solid var(--divider-color);
+      margin-top: 16px;
+    }
+  }
+}

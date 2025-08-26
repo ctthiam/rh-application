@@ -1,4 +1,5 @@
-// src/app/features/employees/components/employee-form/employee-form.component.ts
+// src/app/features/employees/components/employee-form/employee-form.component.ts (corrections)
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -353,7 +354,7 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
     this.employeeForm.patchValue({
       fullName: employee.fullName,
       email: employee.email,
-      phone: employee.phone || '',
+      phone: employee.phone || '', // Correction : utilise la propriété qui existe maintenant
       position: employee.position,
       departmentId: employee.departmentId,
       hireDate: new Date(employee.hireDate),
@@ -377,8 +378,16 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
 
   private createEmployee(): void {
     const formData = this.employeeForm.value;
+    
+    // Extraire prénom et nom du nom complet pour la compatibilité
+    const names = formData.fullName.trim().split(' ');
+    const firstName = names[0];
+    const lastName = names.slice(1).join(' ') || firstName; // Si pas de nom de famille, utiliser le prénom
+
     const createRequest: CreateEmployeeRequest = {
-      fullName: formData.fullName.trim(),
+      firstName: firstName,
+      lastName: lastName,
+      fullName: formData.fullName.trim(), // Correction : inclure fullName
       email: formData.email.trim().toLowerCase(),
       phone: formData.phone?.trim() || undefined,
       position: formData.position.trim(),
@@ -413,8 +422,16 @@ export class EmployeeFormComponent implements OnInit, OnDestroy {
     if (!this.employeeId) return;
 
     const formData = this.employeeForm.value;
+    
+    // Extraire prénom et nom du nom complet pour la compatibilité
+    const names = formData.fullName.trim().split(' ');
+    const firstName = names[0];
+    const lastName = names.slice(1).join(' ') || firstName;
+
     const updateRequest: UpdateEmployeeRequest = {
-      fullName: formData.fullName.trim(),
+      firstName: firstName,
+      lastName: lastName,
+      fullName: formData.fullName.trim(), // Correction : inclure fullName
       email: formData.email.trim().toLowerCase(),
       phone: formData.phone?.trim() || undefined,
       position: formData.position.trim(),

@@ -1,4 +1,4 @@
-// src/app/app.routes.ts (mise à jour avec les routes des employés)
+// src/app/app.routes.ts (mise à jour avec les routes des départements)
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
@@ -52,6 +52,14 @@ export const routes: Routes = [
     ]
   },
 
+  // Routes pour les départements (ADMIN et MANAGER lecture seule)
+  {
+    path: 'departments',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
+    loadChildren: () => import('./features/departments/departments.module').then(m => m.DepartmentsModule)
+  },
+
   // Routes pour les tâches (tous les utilisateurs connectés)
   {
     path: 'tasks',
@@ -74,25 +82,6 @@ export const routes: Routes = [
     ]
   },
 
-  // Routes pour les départements (ADMIN et MANAGER)
-  {
-    path: 'departments',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [UserRole.ADMIN, UserRole.MANAGER] },
-    children: [
-      // {
-      //   path: '',
-      //   loadComponent: () => import('./features/departments/departments.component').then(c => c.DepartmentsComponent)
-      // },
-      // {
-      //   path: 'create',
-      //   canActivate: [RoleGuard],
-      //   data: { roles: [UserRole.ADMIN] },
-      //   loadComponent: () => import('./features/departments/components/department-form/department-form.component').then(c => c.DepartmentFormComponent)
-      // }
-    ]
-  },
-
   // Routes d'administration (ADMIN uniquement)
   {
     path: 'admin',
@@ -102,15 +91,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./features/dashboard/components/admin-dashboard/admin-dashboard.component').then(c => c.AdminDashboardComponent)
-      },
-      // {
-      //   path: 'users',
-      //   loadComponent: () => import('./features/admin/components/user-management/user-management.component').then(c => c.UserManagementComponent)
-      // },
-      // {
-      //   path: 'settings',
-      //   loadComponent: () => import('./features/admin/components/system-settings/system-settings.component').then(c => c.SystemSettingsComponent)
-      // }
+      }
     ]
   },
 

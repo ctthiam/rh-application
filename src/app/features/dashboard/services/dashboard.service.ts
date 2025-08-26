@@ -1,9 +1,9 @@
-// src/app/features/dashboard/services/dashboard.service.ts
+// src/app/features/dashboard/services/dashboard.service.ts (corrigé)
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, combineLatest, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 
 import { environment } from '../../../../environments/environment';
 import { EmployeeService } from '../../../core/services/employee.service';
@@ -11,6 +11,7 @@ import { DepartmentService } from '../../../core/services/department.service';
 import { TaskService } from '../../../core/services/task.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { TaskStatus } from '../../../core/models/task.model';
 
 export interface DashboardStats {
   totalEmployees: number;
@@ -109,8 +110,9 @@ export class DashboardService {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const completedTasks = tasks.filter(t => t.status === 2).length; // TERMINE = 2
-        const overdueTasks = tasks.filter(t => t.isOverdue).length;
+        // Correction : utiliser l'enum TaskStatus au lieu des nombres
+        const completedTasks = tasks.filter(t => t.status === TaskStatus.TERMINE).length;
+        const overdueTasks = tasks.filter(t => this.isTaskOverdue(t)).length;
         const todayTasks = tasks.filter(t => {
           const taskDate = new Date(t.dueDate);
           taskDate.setHours(0, 0, 0, 0);
@@ -158,8 +160,8 @@ export class DashboardService {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const completedTasks = departmentTasks.filter(t => t.status === 2).length;
-        const overdueTasks = departmentTasks.filter(t => t.isOverdue).length;
+        const completedTasks = departmentTasks.filter(t => t.status === TaskStatus.TERMINE).length;
+        const overdueTasks = departmentTasks.filter(t => this.isTaskOverdue(t)).length;
         const todayTasks = departmentTasks.filter(t => {
           const taskDate = new Date(t.dueDate);
           taskDate.setHours(0, 0, 0, 0);
@@ -216,8 +218,8 @@ export class DashboardService {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const completedTasks = tasks.filter(t => t.status === 2).length;
-            const overdueTasks = tasks.filter(t => t.isOverdue).length;
+            const completedTasks = tasks.filter(t => t.status === TaskStatus.TERMINE).length;
+            const overdueTasks = tasks.filter(t => this.isTaskOverdue(t)).length;
             const todayTasks = tasks.filter(t => {
               const taskDate = new Date(t.dueDate);
               taskDate.setHours(0, 0, 0, 0);
@@ -269,8 +271,8 @@ export class DashboardService {
         const tasksByStatus = {
           labels: ['En cours', 'Terminées'],
           data: [
-            tasks.filter(t => t.status === 1).length, // EN_COURS = 1
-            tasks.filter(t => t.status === 2).length  // TERMINE = 2
+            tasks.filter(t => t.status === TaskStatus.EN_COURS).length,
+            tasks.filter(t => t.status === TaskStatus.TERMINE).length
           ],
           colors: ['#ff9800', '#4caf50']
         };
@@ -342,7 +344,6 @@ export class DashboardService {
    * Obtenir les notifications du dashboard
    */
   getNotifications(): Observable<DashboardNotification[]> {
-    // Simuler des notifications (vous pouvez les récupérer depuis l'API)
     const notifications: DashboardNotification[] = [
       {
         id: '1',
@@ -371,8 +372,20 @@ export class DashboardService {
    * Marquer une notification comme lue
    */
   markNotificationAsRead(notificationId: string): Observable<boolean> {
-    // Simuler l'API call
     return of(true);
+  }
+
+  /**
+   * Vérifier si une tâche est en retard
+   */
+  private isTaskOverdue(task: any): boolean {
+    if (task.status === TaskStatus.TERMINE) {
+      return false; // Les tâches terminées ne sont pas en retard
+    }
+    
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today;
   }
 
   /**
@@ -400,6 +413,3 @@ export class DashboardService {
     return { labels, data };
   }
 }
-
-// Import manquant
-import { switchMap } from 'rxjs/operators';

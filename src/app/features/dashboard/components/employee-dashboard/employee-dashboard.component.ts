@@ -1,5 +1,5 @@
+// src/app/features/dashboard/components/employee-dashboard/employee-dashboard.component.ts (corrigé)
 
-// 1. src/app/features/dashboard/components/employee-dashboard/employee-dashboard.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil, forkJoin, map } from 'rxjs';
 
@@ -9,13 +9,14 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { EmployeeService } from '../../../../core/services/employee.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { LoadingService } from '../../../../shared/services/loading.service';
+import { TaskStatus } from '../../../../core/models/task.model';
 
 export interface EmployeeTask {
   id: number;
   title: string;
   description: string;
   dueDate: Date;
-  status: number;
+  status: TaskStatus; // Utiliser l'enum au lieu de number
   priority: string;
   departmentName: string;
   isOverdue: boolean;
@@ -93,6 +94,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (employees) => {
+          // Correction : utiliser la propriété userId qui existe maintenant
           const currentEmployee = employees.find(emp => emp.userId === currentUser.id);
           if (currentEmployee) {
             this.loadEmployeeData(currentEmployee.id);
@@ -124,8 +126,9 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
         stats,
         tasks: tasks.map((task: any) => ({
           ...task,
-          priority: task.priority || 'MEDIUM',
-          progress: task.progress || 0
+          priority: task.priority || 'NORMALE',
+          progress: task.progress || 0,
+          isOverdue: this.isTaskOverdue(task)
         }))
       }))
     )
@@ -166,7 +169,21 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     });
 
     // Tâches en retard
-    this.overdueTasks = this.myTasks.filter(task => task.isOverdue && task.status !== 2);
+    this.overdueTasks = this.myTasks.filter(task => 
+      task.isOverdue && task.status !== TaskStatus.TERMINE
+    );
+  }
+
+  /**
+   * Vérifier si une tâche est en retard
+   */
+  private isTaskOverdue(task: any): boolean {
+    if (task.status === TaskStatus.TERMINE) {
+      return false;
+    }
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today;
   }
 
   /**
@@ -175,7 +192,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   markTaskAsCompleted(taskId: number): void {
     this.loadingService.show();
 
-    this.taskService.updateTaskStatus(taskId, 2) // 2 = TERMINE
+    this.taskService.updateTaskStatus(taskId, TaskStatus.TERMINE)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -193,10 +210,11 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   /**
    * Obtenir la couleur selon le statut de la tâche
    */
-  getStatusColor(status: number): string {
+  getStatusColor(status: TaskStatus): string {
     switch (status) {
-      case 1: return 'warn'; // EN_COURS
-      case 2: return 'primary'; // TERMINE
+      case TaskStatus.EN_COURS: return 'warn';
+      case TaskStatus.TERMINE: return 'primary';
+      case TaskStatus.EN_RETARD: return 'accent';
       default: return 'accent';
     }
   }
@@ -204,10 +222,12 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   /**
    * Obtenir le texte du statut
    */
-  getStatusText(status: number): string {
+  getStatusText(status: TaskStatus): string {
     switch (status) {
-      case 1: return 'En cours';
-      case 2: return 'Terminée';
+      case TaskStatus.EN_COURS: return 'En cours';
+      case TaskStatus.TERMINE: return 'Terminée';
+      case TaskStatus.EN_RETARD: return 'En retard';
+      case TaskStatus.ANNULE: return 'Annulée';
       default: return 'Inconnue';
     }
   }
@@ -215,10 +235,12 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   /**
    * Obtenir l'icône selon le statut
    */
-  getStatusIcon(status: number): string {
+  getStatusIcon(status: TaskStatus): string {
     switch (status) {
-      case 1: return 'schedule';
-      case 2: return 'check_circle';
+      case TaskStatus.EN_COURS: return 'schedule';
+      case TaskStatus.TERMINE: return 'check_circle';
+      case TaskStatus.EN_RETARD: return 'warning';
+      case TaskStatus.ANNULE: return 'cancel';
       default: return 'help';
     }
   }
@@ -228,9 +250,10 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
    */
   getPriorityColor(priority: string): string {
     switch (priority?.toLowerCase()) {
-      case 'haute': return '#f44336';
-      case 'moyenne': return '#ff9800';
-      case 'basse': return '#4caf50';
+      case 'haute': 
+      case 'urgente': return '#f44336';
+      case 'normale': return '#ff9800';
+      case 'faible': return '#4caf50';
       default: return '#9e9e9e';
     }
   }
@@ -239,7 +262,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
    * Vérifier si une tâche peut être marquée comme terminée
    */
   canMarkAsCompleted(task: EmployeeTask): boolean {
-    return task.status === 1; // Seulement les tâches en cours
+    return task.status === TaskStatus.EN_COURS;
   }
 
   /**
@@ -264,17 +287,17 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     const progress = this.getProgressPercentage();
     
     if (progress === 100) {
-      return "Félicitations ! Toutes vos tâches sont terminées ! 🎉";
+      return "Félicitations ! Toutes vos tâches sont terminées !";
     } else if (progress >= 80) {
-      return "Excellent travail ! Vous êtes presque au bout ! 💪";
+      return "Excellent travail ! Vous êtes presque au bout !";
     } else if (progress >= 60) {
-      return "Bon rythme ! Continuez comme ça ! 👍";
+      return "Bon rythme ! Continuez comme ça !";
     } else if (progress >= 40) {
-      return "Vous progressez bien, gardez le cap ! ⭐";
+      return "Vous progressez bien, gardez le cap !";
     } else if (progress >= 20) {
-      return "C'est un bon début, persévérez ! 🚀";
+      return "C'est un bon début, persévérez !";
     } else {
-      return "Commencez par vos tâches prioritaires ! 💼";
+      return "Commencez par vos tâches prioritaires !";
     }
   }
 
