@@ -1,12 +1,14 @@
-// src/app/features/dashboard/dashboard.module.ts (version corrigée)
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // AJOUTÉ pour ngModel
+
+import { DashboardChartsComponent } from './components/dashboard-charts/dashboard-charts.component';
+import { RecentTasksComponent } from './components/recent-tasks/recent-tasks.component';
 
 // Import du routing module
 import { DashboardRoutingModule } from './dashboard-routing.module';
 
-// Angular Material Modules
+// Angular Material Modules - MODULES MANQUANTS AJOUTÉS
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +22,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
+
+// MODULES MANQUANTS AJOUTÉS POUR RÉSOUDRE LES ERREURS
+import { MatMenuModule } from '@angular/material/menu'; // Pour mat-menu et matMenuTriggerFor
+import { MatCheckboxModule } from '@angular/material/checkbox'; // Pour mat-checkbox
 
 // Components
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
@@ -35,11 +41,14 @@ import { NotificationsComponent } from './components/notifications/notifications
   ],
   imports: [
     CommonModule,
-    
+    FormsModule, // AJOUTÉ - Nécessaire pour ngModel
+    DashboardChartsComponent,
     // IMPORTANT: Ajouter le routing module ici
     DashboardRoutingModule,
     AdminDashboardComponent,
-    // Angular Material
+    RecentTasksComponent,
+    
+    // Angular Material - MODULES CORRIGÉS ET COMPLÉTÉS
     MatCardModule,
     MatIconModule,
     MatButtonModule,
@@ -53,6 +62,10 @@ import { NotificationsComponent } from './components/notifications/notifications
     MatInputModule,
     MatTabsModule,
     MatTableModule,
+    
+    // NOUVEAUX MODULES AJOUTÉS
+    MatMenuModule, // Pour résoudre les erreurs mat-menu
+    MatCheckboxModule, // Pour résoudre les erreurs mat-checkbox
   ]
 })
 export class DashboardModule { }

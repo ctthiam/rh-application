@@ -1,80 +1,161 @@
-<mat-card class="notifications-card">
-  <mat-card-header>
-    <mat-card-title>
+<!-- src/app/features/dashboard/components/notifications/notifications.component.html -->
+
+<div class="notifications-container">
+  <!-- En-tête des notifications -->
+  <div class="notifications-header">
+    <div class="header-title">
       <mat-icon>notifications</mat-icon>
-      Notifications
-      <mat-chip *ngIf="unreadCount > 0" class="unread-badge">{{ unreadCount }}</mat-chip>
-    </mat-card-title>
-    <div class="card-actions">
-      <button mat-icon-button (click)="onClearAll()" matTooltip="Tout marquer comme lu" *ngIf="unreadCount > 0">
+      <h3>Notifications</h3>
+      <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+    </div>
+    
+    <div class="header-actions">
+      <button 
+        mat-icon-button 
+        (click)="onClearAll()" 
+        [disabled]="notifications.length === 0"
+        matTooltip="Marquer tout comme lu"
+      >
         <mat-icon>done_all</mat-icon>
       </button>
-      <button mat-icon-button (click)="toggleShowAll()" [matTooltip]="showAll ? 'Voir moins' : 'Voir tout'">
-        <mat-icon>{{ showAll ? 'expand_less' : 'expand_more' }}</mat-icon>
+      
+      <button 
+        mat-icon-button 
+        [matMenuTriggerFor]="settingsMenu"
+        matTooltip="Paramètres"
+      >
+        <mat-icon>settings</mat-icon>
       </button>
     </div>
-  </mat-card-header>
+  </div>
 
-  <mat-card-content>
-    <div class="notifications-container" *ngIf="!loading; else loadingTemplate">
-      <div 
-        *ngFor="let notification of displayedNotifications; trackBy: trackByNotificationId" 
-        class="notification-item"
-        [ngClass]="getNotificationClasses(notification)"
-        (click)="onNotificationClick(notification)">
-        
-        <div class="notification-icon">
-          <mat-icon [ngClass]="getNotificationColor(notification.type)">
-            {{ getNotificationIcon(notification.type) }}
-          </mat-icon>
-        </div>
-
-        <div class="notification-content">
-          <div class="notification-header">
-            <div class="notification-title">{{ notification.title }}</div>
-            <div class="notification-meta">
-              <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
-              <button 
-                *ngIf="!notification.read"
-                mat-icon-button 
-                class="mark-read-btn"
-                (click)="onMarkAsRead($event, notification.id)"
-                matTooltip="Marquer comme lu">
-                <mat-icon>done</mat-icon>
-              </button>
-            </div>
-          </div>
-          
-          <div class="notification-message">{{ notification.message }}</div>
-          
-          <div class="notification-action" *ngIf="notification.actionUrl">
-            <button mat-button color="primary" class="action-btn">
-              Voir détails
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
-          </div>
-        </div>
-
-        <div class="notification-indicator" *ngIf="!notification.read"></div>
+  <!-- Menu des paramètres -->
+  <mat-menu #settingsMenu="matMenu">
+    <div class="settings-menu">
+      <h4>Paramètres de notification</h4>
+      <div class="setting-item">
+        <mat-checkbox [(ngModel)]="settings.showTaskReminders">
+          Rappels de tâches
+        </mat-checkbox>
       </div>
-
-      <div class="no-notifications" *ngIf="notifications.length === 0">
-        <mat-icon>notifications_none</mat-icon>
-        <p>Aucune notification</p>
+      <div class="setting-item">
+        <mat-checkbox [(ngModel)]="settings.showDeadlineAlerts">
+          Alertes d'échéances
+        </mat-checkbox>
       </div>
-
-      <div class="show-more" *ngIf="notifications.length > 5 && !showAll">
-        <button mat-button (click)="toggleShowAll()">
-          Voir {{ notifications.length - 5 }} notification(s) de plus
-        </button>
+      <div class="setting-item">
+        <mat-checkbox [(ngModel)]="settings.showTeamUpdates">
+          Mises à jour équipe
+        </mat-checkbox>
       </div>
     </div>
+  </mat-menu>
 
-    <ng-template #loadingTemplate>
-      <div class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p>Chargement des notifications...</p>
+  <!-- Liste des notifications -->
+  <div class="notifications-list" *ngIf="displayedNotifications.length > 0; else noNotifications">
+    <div 
+      class="notification-item" 
+      *ngFor="let notification of displayedNotifications; trackBy: trackByNotificationId"
+      [ngClass]="getNotificationClasses(notification)"
+      (click)="onNotificationClick(notification)"
+    >
+      <!-- Icône et indicateur -->
+      <div class="notification-icon">
+        <mat-icon [ngClass]="getNotificationColor(notification.type)">
+          {{ getNotificationIcon(notification.type) }}
+        </mat-icon>
+        <div class="unread-dot" *ngIf="!notification.read"></div>
       </div>
-    </ng-template>
-  </mat-card-content>
-</mat-card>
+
+      <!-- Contenu -->
+      <div class="notification-content">
+        <div class="notification-header">
+          <h4 class="notification-title">{{ notification.title }}</h4>
+          <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
+        </div>
+        
+        <p class="notification-message">{{ notification.message }}</p>
+        
+        <!-- Actions contextuelles -->
+        <div class="notification-actions" *ngIf="notification.actionUrl">
+          <button 
+            mat-stroked-button 
+            size="small" 
+            (click)="onActionClick($event, notification)"
+            class="action-btn"
+          >
+            <mat-icon>open_in_new</mat-icon>
+            Voir détails
+          </button>
+        </div>
+      </div>
+
+      <!-- Bouton marquer comme lu -->
+      <div class="notification-controls">
+        <button 
+          mat-icon-button 
+          *ngIf="!notification.read"
+          (click)="onMarkAsRead($event, notification.id)"
+          matTooltip="Marquer comme lu"
+          class="mark-read-btn"
+        >
+          <mat-icon>check</mat-icon>
+        </button>
+        
+        <button 
+          mat-icon-button 
+          (click)="onDismiss($event, notification.id)"
+          matTooltip="Masquer"
+          class="dismiss-btn"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Barre de priorité -->
+      <div class="priority-bar" [ngClass]="'priority-' + notification.type"></div>
+    </div>
+
+    <!-- Bouton Voir plus/moins -->
+    <div class="toggle-view" *ngIf="notifications.length > 5">
+      <button mat-stroked-button (click)="toggleShowAll()" class="toggle-btn">
+        <mat-icon>{{ showAll ? 'expand_less' : 'expand_more' }}</mat-icon>
+        {{ showAll ? 'Voir moins' : 'Voir toutes (' + notifications.length + ')' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- État vide -->
+  <ng-template #noNotifications>
+    <div class="empty-state">
+      <mat-icon>notifications_off</mat-icon>
+      <h4>Aucune notification</h4>
+      <p>Vous êtes à jour ! Les nouvelles notifications apparaîtront ici.</p>
+    </div>
+  </ng-template>
+
+  <!-- Indicateur de chargement -->
+  <div class="loading-indicator" *ngIf="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Chargement des notifications...</p>
+  </div>
+</div>
+
+<!-- Notifications Toast (pour les nouvelles notifications) -->
+<div class="toast-container" *ngIf="newNotifications.length > 0">
+  <div 
+    class="notification-toast" 
+    *ngFor="let toast of newNotifications; trackBy: trackByNotificationId"
+    [ngClass]="getNotificationColor(toast.type)"
+    [@slideIn]
+  >
+    <mat-icon>{{ getNotificationIcon(toast.type) }}</mat-icon>
+    <div class="toast-content">
+      <strong>{{ toast.title }}</strong>
+      <p>{{ toast.message }}</p>
+    </div>
+    <button mat-icon-button (click)="dismissToast(toast.id)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

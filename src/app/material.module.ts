@@ -1,4 +1,3 @@
-// src/app/material.module.ts (version corrigée)
 import { NgModule } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +11,13 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
-import { MatProgressBarModule } from '@angular/material/progress-bar'; // AJOUTÉ
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+
+// MODULES AJOUTÉS POUR RÉSOUDRE LES ERREURS
+import { MatMenuModule } from '@angular/material/menu'; // Pour mat-menu et matMenuTriggerFor
+import { MatCheckboxModule } from '@angular/material/checkbox'; // Pour mat-checkbox
+import { MatTooltipModule } from '@angular/material/tooltip'; // Pour matTooltip
+import { MatChipsModule } from '@angular/material/chips'; // Pour mat-chip-set
 
 @NgModule({
   exports: [
@@ -28,7 +33,13 @@ import { MatProgressBarModule } from '@angular/material/progress-bar'; // AJOUT�
     MatSortModule,
     MatDialogModule,
     MatSelectModule,
-    MatProgressBarModule // AJOUTÉ
+    MatProgressBarModule,
+    
+    // NOUVEAUX EXPORTS AJOUTÉS
+    MatMenuModule, // Pour résoudre les erreurs mat-menu
+    MatCheckboxModule, // Pour résoudre les erreurs mat-checkbox
+    MatTooltipModule, // Pour matTooltip
+    MatChipsModule, // Pour mat-chip-set
   ]
 })
 export class MaterialModule { }
